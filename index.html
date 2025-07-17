@@ -21,6 +21,12 @@
         flex-direction: column;
       }
 
+      #error-message {
+        display: none; 
+        color: red;
+      }
+
+
       /* --- Login --- */
       #login-container {
         position: fixed;
@@ -209,6 +215,8 @@
         border-radius: 10px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
       }
+
+      
     </style>
 
 
@@ -420,20 +428,6 @@
           }
 
 
-          function cerrarSesion() {
-            // Mostrar login container
-            document.getElementById('login-container').style.display = 'flex';
-            document.getElementById('main-content').style.display = 'none';
-            
-            // Limpiar campos y mostrar login box con animación
-            document.getElementById('inputUsername').value = '';
-            document.getElementById('inputPassword').value = '';
-            document.getElementById('error-message').style.display = 'none';
-            
-            setTimeout(() => {
-                document.getElementById('login-box').classList.remove('hidden');
-            }, 50);
-          }
 
 
           // SECCIÓN RUC - Generación del formulario
