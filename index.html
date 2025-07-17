@@ -1,1151 +1,337 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sistema SRI Web - Estilo Moderno</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Sistema SRI Web - Estilo Moderno</title>
 
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
+      * {
+        box-sizing: border-box;
+        font-family: 'Arial', sans-serif;
+      }
 
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-            color: #333;
-        }
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        color: #333;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
 
-        /* --- Login --- */
-        #login-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #004b8d, #0077cc);
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+      /* --- Login --- */
+      #login-container {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: linear-gradient(135deg, #004b8d, #0077cc);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
 
-        .login-box {
-            width: 350px;
-            padding: 30px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
+      .login-box {
+        width: 350px;
+        padding: 30px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: all 0.3s ease;
+      }
 
-        .login-box.hidden {
-            transform: translateY(-20px);
-            opacity: 0;
-        }
+      .login-box.hidden {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
 
-        .login-box h2 {
-            color: #004b8d;
-            margin-bottom: 20px;
-        }
+      .login-box h2 {
+        color: #004b8d;
+        margin-bottom: 20px;
+      }
 
-        /* --- Inputs --- */
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
+      /* --- Sidebar --- */
+      .sidebar {
+        position: fixed;
+        top: 0; left: 0;
+        height: 100vh;
+        width: 240px;
+        background-color: #002b5c;
+        color: white;
+        box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        overflow-y: auto;
+      }
 
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #7f8c8d;
-            font-size: 14px;
-        }
+      .sidebar .logo {
+        text-align: center;
+        font-size: 26px;
+        font-weight: bold;
+        padding: 20px;
+        background: #004b8d;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
 
-        .input-group input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border 0.3s;
-        }
+      .nav-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
 
-        .input-group input:focus {
-            border-color: #3498db;
-            outline: none;
-        }
+      .nav-list li {
+        padding: 15px 20px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
 
-        /* --- Botones generales --- */
-        button {
-            padding: 10px 16px;
-            background-color: #004b8d;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.3s;
-        }
+      .nav-list li:hover {
+        background-color: #0069d9;
+      }
 
-        button:hover {
-            background-color: #0069d9;
-        }
+      /* --- Topbar --- */
+      .topbar {
+        position: fixed;
+        top: 0; left: 240px;
+        height: 60px;
+        width: calc(100% - 240px);
+        background-color: #004b8d;
+        color: white;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        z-index: 999;
+      }
 
-        /* --- Mensajes de error --- */
-        .error-message {
-            color: #e74c3c;
-            margin-top: 15px;
-            font-size: 14px;
-            display: none;
-        }
+      .topbar h1 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: bold;
+      }
 
-        /* --- Contenido principal --- */
-        #main-content {
-            display: none;
-            padding: 20px;
-        }
+      /* --- Contenedor principal --- */
+      .main-container {
+        margin-left: 240px;
+        margin-top: 60px;
+        padding: 20px;
+        flex: 1;
+        padding-bottom: 60px; /* Espacio para footer */
+      }
 
-        .welcome-message {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
-        }
+      /* --- Footer --- */
+      footer {
+        text-align: center;
+        padding: 12px;
+        background: #004b8d;
+        color: white;
+        height: 50px;
+        line-height: 50px;
+        font-size: 16px;
+        position: relative;
+        width: 100%;
+      }
 
-        /* --- Sidebar --- */
+      /* --- Responsive --- */
+      @media (max-width: 900px) {
         .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 260px;
-            background-color: #002b5c;
-            color: white;
-            z-index: 1000;
-            box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+          width: 200px;
         }
 
-        .sidebar .logo {
-            text-align: center;
-            font-size: 26px;
-            font-weight: bold;
-            padding: 20px;
-            background: #004b8d;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .nav-list li {
-            padding: 15px 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .nav-list li:hover {
-            background-color: #0069d9;
-        }
-
-        /* --- Topbar --- */
         .topbar {
-            position: fixed;
-            top: 0;
-            left: 260px;
-            height: 60px;
-            width: calc(100% - 260px);
-            background-color: #004b8d;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 999;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
+          left: 200px;
+          width: calc(100% - 200px);
         }
 
-        .topbar h1 {
-            margin: 0;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-
-        .toggle-btn {
-            font-size: 24px;
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-        }
-
-        /* --- Contenedor principal --- */
         .main-container {
-            margin-left: 260px;
-            margin-top: 60px;
-            padding: 20px;
-            transition: margin-left 0.3s ease;
+          margin-left: 200px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .sidebar {
+          width: 100%;
+          height: auto;
+          position: relative;
         }
 
-        /* --- Módulo general --- */
-        .modulo {
-            display: none;
+        .topbar {
+          left: 0;
+          width: 100%;
+          position: relative;
         }
 
-        .modulo.active {
-            display: block;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        .main-container {
+          margin-left: 0;
+          margin-top: 0;
+          padding-top: 20px;
         }
+      }
 
-        /* --- Títulos --- */
-        h2 {
-            color: #004b8d;
-            font-size: 22px;
-            margin-bottom: 15px;
-        }
+      /* --- Botones, Formularios y Estilos Secundarios (resumen) --- */
+      button {
+        padding: 10px 16px;
+        background-color: #004b8d;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #0069d9;
+      }
 
-        h4 {
-            margin-top: 20px;
-            color: #004b8d;
-        }
+      h2, h3, h4 {
+        color: #004b8d;
+      }
 
-        /* --- Footer --- */
-        footer {
-            text-align: center;
-            padding: 12px;
-            background: #004b8d;
-            color: white;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
+      .input-group input,
+      input, select {
+        padding: 12px 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        width: 100%;
+      }
 
-        /* --- Formulario RUC --- */
-        #formularioRUC {
-            max-width: 500px;
-            margin: 30px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        }
+      .modulo {
+        display: none;
+      }
 
-        #formularioRUC h3 {
-            text-align: center;
-            color: #004b8d;
-            margin-bottom: 20px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        #formularioRUC form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        #formularioRUC input,
-        #formularioRUC select {
-            padding: 12px 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        #formularioRUC input:focus,
-        #formularioRUC select:focus {
-            border-color: #3498db;
-            outline: none;
-        }
-
-        #formularioRUC button {
-            padding: 12px;
-            background-color: #004b8d;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #formularioRUC button:hover {
-            background-color: #0069d9;
-        }
-
-        /* --- Facturación: centrado y estilos --- */
-        #facturacion {
-            display: flex; /* Cambiado a flex */
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        #facturacion .subopciones {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            margin-top: 20px;
-            width: 100%;
-        }
-
-        #facturacion .subopciones button {
-            width: 280px;
-            background-color: #004b8d;
-            color: #fff;
-            padding: 12px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-align: center;
-            transition: background-color 0.3s ease;
-        }
-
-        #facturacion .subopciones button:hover {
-            background-color: #0069d9;
-        }
-
-        #facturacion h2 {
-            color: #004b8d;
-            margin-bottom: 10px;
-        }
-
-        /* --- Formularios de facturación --- */
-        #facturacionFisica,
-        #facturacionElectronica {
-            max-width: 600px;
-            margin: 30px auto;
-            padding: 25px;
-            background-color: #ffffff;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        #facturacionElectronica {
-            background-color: #eef6ff;
-        }
-
-        #facturacionFisica h2,
-        #facturacionElectronica h2,
-        #facturacionFisica form,
-        #facturacionElectronica form {
-            text-align: center;
-        }
-
-        #facturacionFisica form,
-        #facturacionElectronica form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        #facturacionFisica input,
-        #facturacionElectronica input {
-            width: 100%;
-            max-width: 480px;
-            padding: 10px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
-
-        #facturacionFisica button,
-        #facturacionElectronica button {
-            background-color: #28a745;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        #facturacionFisica button:hover,
-        #facturacionElectronica button:hover {
-            background-color: #218838;
-        }
-
-        /* --- Responsive --- */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-260px);
-                width: 70%;
-                min-width: 220px;
-            }
-
-            .sidebar.visible {
-                transform: translateX(0);
-            }
-
-            .main-container {
-                margin-left: 0;
-                padding: 15px;
-            }
-
-            .topbar {
-                left: 0;
-                width: 100%;
-                padding-left: 20px;
-            }
-
-            .topbar.collapsed {
-                left: 0;
-                width: 100%;
-            }
-
-            #facturacion .subopciones {
-                width: 100%;
-            }
-
-            #facturacion .subopciones button {
-                width: 90%;
-                max-width: 280px;
-            }
-
-            .login-box {
-                width: 90%;
-                max-width: 350px;
-            }
-        }
+      .modulo.active {
+        display: block;
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      }
     </style>
 
 
-</head>
-<body>
-  <!-- Login Interface -->
-  <div id="login-container">
-      <div class="login-box" id="login-box">
-          <h2>Iniciar Sesión</h2>
-          
-          <div class="input-group">
-              <input type="text" id="inputUsername" placeholder="Ingresa tu usuario">
-              <input type="password" id="inputPassword" placeholder="Ingresa tu contraseña">
+  </head>
+  <body>
+    <!-- Login Interface -->
+    <div id="login-container">
+        <div class="login-box" id="login-box">
+            <h2>Iniciar Sesión</h2>
+            
+            <div class="input-group">
+                <input type="text" id="inputUsername" placeholder="Ingresa tu usuario">
+                <input type="password" id="inputPassword" placeholder="Ingresa tu contraseña">
+            </div>
+            
+            <button class="login-btn" onclick="attemptLogin()">Ingresar</button>
+            <div id="error-message" class="error-message">Usuario o contraseña incorrectos</div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div id="main-content" style="display: none;">
+
+      <!-- Menú lateral -->
+      <aside class="sidebar" id="sidebar">
+        <div class="logo">SRI</div>
+        <ul class="nav-list">
+          <li onclick="mostrar('dimm')"><span>🪪</span> DIMM</li>
+          <li onclick="mostrar('facturacion')"><span>📄</span> Facturación</li>
+          <li onclick="mostrar('anexos')"><span>📂</span> Anexos</li>
+          <li onclick="mostrar('deudas')"><span>📉</span> Deudas</li>
+          <li onclick="mostrar('vehiculos')"><span>🚗</span> Vehículos</li>
+          <li onclick="mostrar('grafica')"><span>📊</span> Gráfica</li>
+        </ul>
+      </aside>
+
+      <!-- Encabezado superior -->
+      <header class="topbar">
+        <h1 class="topbar-title">Sistema Web - SRI</h1>
+        
+        <div id="usuarioInfo" style="display: none;">
+          <span id="nombreUsuario">👤</span>
+          <button onclick="cerrarSesion()" style="background: none; border: none; color: #004b8d; cursor: pointer; font-size: 18px;">🚪</button>
+        </div>
+      </header>
+
+
+      <!-- Contenido principal -->
+      <main class="main-container">
+        <section id="inicio" class="modulo">
+          <h2>Bienvenido al Sistema Web del SRI</h2>
+          <p>Selecciona una opción del menú para continuar.</p>
+        </section>
+
+        <!-- Módulo DIMM -->
+        <section id="dimm" class="modulo">
+          <h2>Gestión de RUC</h2>
+          <div class="subopciones">
+            <button onclick="nuevoRUC()">Nuevo</button>
+            <button onclick="editarRUC()">Editar</button>
+            <button onclick="eliminarRUC()">Eliminar</button>
           </div>
-          
-          <button class="login-btn" onclick="attemptLogin()">Ingresar</button>
-          <div id="error-message" class="error-message">Usuario o contraseña incorrectos</div>
-      </div>
-  </div>
-  
-  <!-- Main Content -->
-  <div id="main-content" style="display: none;">
+          <div id="contenidoDIMM"></div>
+        </section>
 
-    <!-- Menú lateral -->
-    <aside class="sidebar" id="sidebar">
-      <div class="logo">SRI</div>
-      <ul class="nav-list">
-        <li onclick="mostrar('dimm')"><span>🪪</span> DIMM</li>
-        <li onclick="mostrar('facturacion')"><span>📄</span> Facturación</li>
-        <li onclick="mostrar('anexos')"><span>📂</span> Anexos</li>
-        <li onclick="mostrar('deudas')"><span>📉</span> Deudas</li>
-        <li onclick="mostrar('vehiculos')"><span>🚗</span> Vehículos</li>
-        <li onclick="mostrar('grafica')"><span>📊</span> Gráfica</li>
-      </ul>
-    </aside>
+        <!-- Módulo Vehículos -->
+        <section id="vehiculos" class="modulo">
+          <h2>Módulo Vehículos</h2>
+          <div class="subopciones">
+            <button onclick="mostrarConsultaVehiculo()">Valores a pagar por placa, RAMV, CPN o chasis</button>
+            <button onclick="mostrarReportePagoVehiculo()">Reporte de pagos</button>
+          </div>
+          <div id="contenidoVehiculos"></div>
+        </section>
 
-    <!-- Encabezado superior -->
-    <header class="topbar">
-      <h1 class="topbar-title">Sistema Web - SRI</h1>
-      
-      <div id="usuarioInfo" style="display: none;">
-        <span id="nombreUsuario">👤</span>
-        <button onclick="cerrarSesion()" style="background: none; border: none; color: #004b8d; cursor: pointer; font-size: 18px;">🚪</button>
-      </div>
-    </header>
+        <!-- Módulo Deudas -->
+        <section id="deudas" class="modulo" style="display:center;">
+          <h2>Módulo Deudas</h2>
+          <div class="subopciones">
+            <button onclick="mostrarConsultaDeudas()">Consultar Deudas</button>
+            <button id="btnPagarDeudas" onclick="mostrarPagoDeudas()" disabled>Pagar Deudas</button>
+            <button id="btnFacilidadesPago" onclick="mostrarFacilidadesPago()" disabled>Solicitar Facilidades de Pago</button>
+          </div>
 
+          <div id="contenidoDeudas"></div>
+        </section>
 
-    <!-- Contenido principal -->
-    <main class="main-container">
-      <section id="inicio" class="modulo">
-        <h2>Bienvenido al Sistema Web del SRI</h2>
-        <p>Selecciona una opción del menú para continuar.</p>
-      </section>
+        <!-- Módulo Anexos -->
+        <section id="anexos" class="modulo hidden">
+          <h2>Módulo Anexos</h2>
+          <div class="subopciones">
+            <button onclick="mostrarEnvioConsultaAnexos()">Envío y Consulta de Anexos</button>
+            <button onclick="mostrarGastosPersonales()">Anexo de Gastos Personales en Línea</button>
+          </div>
 
-      <!-- Módulo DIMM -->
-      <section id="dimm" class="modulo">
-        <h2>Gestión de RUC</h2>
-        <div class="subopciones">
-          <button onclick="nuevoRUC()">Nuevo</button>
-          <button onclick="editarRUC()">Editar</button>
-          <button onclick="eliminarRUC()">Eliminar</button>
-        </div>
-        <div id="contenidoDIMM"></div>
-      </section>
-
-      <!-- Módulo Vehículos -->
-      <section id="vehiculos" class="modulo">
-        <h2>Módulo Vehículos</h2>
-        <div class="subopciones">
-          <button onclick="mostrarConsultaVehiculo()">Valores a pagar por placa, RAMV, CPN o chasis</button>
-          <button onclick="mostrarReportePagoVehiculo()">Reporte de pagos</button>
-        </div>
-        <div id="contenidoVehiculos"></div>
-      </section>
-
-      <!-- Módulo Deudas -->
-      <section id="deudas" class="modulo" style="display:center;">
-        <h2>Módulo Deudas</h2>
-        <div class="subopciones">
-          <button onclick="mostrarConsultaDeudas()">Consultar Deudas</button>
-          <button id="btnPagarDeudas" onclick="mostrarPagoDeudas()" disabled>Pagar Deudas</button>
-          <button id="btnFacilidadesPago" onclick="mostrarFacilidadesPago()" disabled>Solicitar Facilidades de Pago</button>
-        </div>
-
-        <div id="contenidoDeudas"></div>
-      </section>
-
-      <!-- Módulo Anexos -->
-      <section id="anexos" class="modulo hidden">
-        <h2>Módulo Anexos</h2>
-        <div class="subopciones">
-          <button onclick="mostrarEnvioConsultaAnexos()">Envío y Consulta de Anexos</button>
-          <button onclick="mostrarGastosPersonales()">Anexo de Gastos Personales en Línea</button>
-        </div>
-
-        <div id="contenidoAnexos"></div>
-      </section>
+          <div id="contenidoAnexos"></div>
+        </section>
 
 
-      
-      <!-- Módulo Gráfica -->
-<section id="grafica" class="modulo">
-  <h2>Gráfica General</h2>
-  <div id="graficas" style="text-align: center;">
-    <button onclick="mostrarGrafica()" style="margin-bottom: 15px; padding: 10px 20px; background-color: #0c3a70; color: white; border: none; border-radius: 5px; cursor: pointer;">
-      📊 Generar gráfica
-    </button>
-    <canvas id="graficaSistema" width="600" height="400"></canvas>
-  </div>
-</section>
-
-  
-<!-- Módulo Facturación -->
-<section id="facturacion" class="modulo" style="display: none;"> <!-- Asegúrate de que esté oculto por defecto -->
-  <h2>Autorización de Facturación</h2>
-  <div class="subopciones">
-    <button onclick="mostrarFacturacionFisica()">📄 Facturación Física</button>
-    <button onclick="mostrarFacturacionElectronica()">💻 Facturación Electrónica</button>
-  </div>
-</section>
-
-<!-- Contenedor para Facturación Física -->
-<section id="facturacionFisica" style="display:none; padding: 20px; background-color: #fff; border-radius: 8px; margin-top: 10px;">
-  <h2>Facturación Física - Simulador SRI</h2>
-  <form id="formFacturaFisica">
-    <h4>Datos del Emisor</h4>
-    <input type="text" placeholder="Razón Social" id="emisor" required><br>
-    <input type="text" placeholder="RUC" id="rucEmisor" required><br>
-    <input type="text" placeholder="Dirección" id="direccionEmisor" required><br>
-
-    <h4>Datos del Cliente</h4>
-    <input type="text" placeholder="Nombre del Cliente" id="cliente" required><br>
-    <input type="text" placeholder="Cédula/RUC Cliente" id="rucCliente" required><br>
-
-    <h4>Detalles de la Factura</h4>
-    <input type="text" placeholder="Descripción del Producto o Servicio" id="detalle" required><br>
-    <input type="number" placeholder="Cantidad" id="cantidad" required><br>
-    <input type="number" placeholder="Precio Unitario" id="precio" required><br>
-
-    <button type="button" onclick="generarFacturaFisica()">📝 Generar Factura Física</button>
-  </form>
-</section>
-
-<!-- Contenedor para Facturación Electrónica -->
-<section id="facturacionElectronica" style="display:none; padding: 20px; background-color: #eef; border-radius: 8px; margin-top: 10px;">
-  <h2>Facturación Electrónica - Simulador SRI</h2>
-  <form id="formFacturaElectronica">
-    <h4>Datos del Emisor</h4>
-    <input type="text" placeholder="Razón Social" id="emisorE" required><br>
-    <input type="text" placeholder="RUC" id="rucEmisorE" required><br>
-    <input type="text" placeholder="Dirección" id="direccionEmisorE" required><br>
-
-    <h4>Datos del Cliente</h4>
-    <input type="text" placeholder="Nombre del Cliente" id="clienteE" required><br>
-    <input type="text" placeholder="Cédula/RUC Cliente" id="rucClienteE" required><br>
-
-    <h4>Detalle de la Factura</h4>
-    <input type="text" placeholder="Producto o Servicio" id="detalleE" required><br>
-    <input type="number" placeholder="Cantidad" id="cantidadE" required><br>
-    <input type="number" placeholder="Precio Unitario" id="precioE" required><br>
-
-    <button type="button" onclick="generarFacturaElectronica()">📤 Emitir Factura Electrónica</button>
-  </form>
-</section>
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    //VARIABLES 
-    let listaRUCs = []; 
-    let registrosDIMM = [];
-    let anexosGuardados = [];
-
+        
+  <!-- Módulo Gráfica -->
+  <section id="grafica" class="modulo">
+    <h2>Gráfica General</h2>
+    <div id="graficas" style="text-align: center;">
+      <button onclick="mostrarGrafica()" style="margin-bottom: 15px; padding: 10px 20px; background-color: #0c3a70; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        📊 Generar gráfica
+      </button>
+      <canvas id="graficaSistema" max-width="600" margin="auto" ></canvas>
+    </div>
+  </section>
 
     
-
-
-
-    //INICIO DE SECCION
-
-    function attemptLogin() {
-      const username = document.getElementById('inputUsername').value;
-      const password = document.getElementById('inputPassword').value;
-      const errorMessage = document.getElementById('error-message');
-      
-      errorMessage.style.display = 'none';
-      
-      if(username === 'Lis' && password === '12345') {
-          console.log("Inicio de sesión correcto");
-          
-          // Ocultar login box con animación
-          document.getElementById('login-box').classList.add('hidden');
-          
-          // Mostrar contenido principal después de la animación
-          setTimeout(() => {
-              document.getElementById('login-container').style.display = 'none';
-              document.getElementById('main-content').style.display = 'block';
-              document.getElementById('username-display').textContent = username;
-          }, 300);
-      } else {
-          console.warn("Fallo en inicio de sesión");
-          errorMessage.style.display = 'block';
-          document.getElementById('inputPassword').value = '';
-      }
-    }
-
-
-    function cerrarSesion() {
-      // Mostrar login container
-      document.getElementById('login-container').style.display = 'flex';
-      document.getElementById('main-content').style.display = 'none';
-      
-      // Limpiar campos y mostrar login box con animación
-      document.getElementById('inputUsername').value = '';
-      document.getElementById('inputPassword').value = '';
-      document.getElementById('error-message').style.display = 'none';
-      
-      setTimeout(() => {
-          document.getElementById('login-box').classList.remove('hidden');
-      }, 50);
-    }
-
-
-    // SECCIÓN RUC - Generación del formulario
-function nuevoRUC() {
-  const contenido = document.getElementById("contenidoDIMM");
-
-  contenido.innerHTML = `
-    <div id="formularioRUC" class="form-card">
-      <h3 class="form-title">Registrar RUC</h3>
-      <form onsubmit="return validarFormularioRUC()" class="form-body">
-        <div class="form-group">
-          <input type="text" id="ruc" placeholder="RUC (13 dígitos)" required />
-        </div>
-        <div class="form-group">
-          <input type="text" id="razonSocial" placeholder="Razón Social" required />
-        </div>
-        <div class="form-group">
-          <input type="text" id="direccion" placeholder="Dirección Matriz" required />
-        </div>
-        <div class="form-group">
-          <input type="text" id="celular" placeholder="Número Celular (10 dígitos)" required />
-        </div>
-        <div class="form-group">
-          <input type="email" id="correo" placeholder="Correo Electrónico" required />
-        </div>
-        <div class="form-group">
-          <select id="tipoIdentificacion" required onchange="actualizarPlaceholder()">
-            <option value="">Seleccione tipo de identificación</option>
-            <option value="cedula">Cédula</option>
-            <option value="pasaporte">Pasaporte</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <input type="text" id="identificacion" placeholder="Número de Cédula o Pasaporte" required />
-        </div>
-        <div class="form-group">
-          <button type="submit">Registrar</button>
-        </div>
-      </form>
-    </div>
-  `;
-}
-
-
-// Validación del formulario RUC
-function validarFormularioRUC() {
-  const ruc = document.getElementById('ruc').value.trim();
-  const razonSocial = document.getElementById('razonSocial').value.trim();
-  const direccion = document.getElementById('direccion').value.trim();
-  const celular = document.getElementById('celular').value.trim();
-  const correo = document.getElementById('correo').value.trim();
-  const tipoID = document.getElementById('tipoIdentificacion').value;
-  const identificacion = document.getElementById('identificacion').value.trim();
-
-  // Validaciones...
-  if (!/^\d{13}$/.test(ruc) || !ruc.endsWith("001")) {
-    alert("El RUC debe tener 13 dígitos numéricos y terminar en '001'.");
-    return false;
-  }
-  if (razonSocial.length < 3) {
-    alert("La razón social debe tener al menos 3 caracteres.");
-    return false;
-  }
-  if (direccion.length < 5) {
-    alert("La dirección matriz debe tener al menos 5 caracteres.");
-    return false;
-  }
-  if (!/^09\d{8}$/.test(celular)) {
-    alert("El número celular debe tener 10 dígitos y comenzar con '09'.");
-    return false;
-  }
-  const correoRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.([a-z]{2,}|com|net|org|edu|ec|gob\.ec)$/i;
-  if (!correoRegex.test(correo)) {
-    alert("El correo debe tener un formato válido y usar un dominio permitido.");
-    return false;
-  }
-  if (tipoID === "cedula") {
-    if (!/^\d{10}$/.test(identificacion)) {
-      alert("La cédula debe tener exactamente 10 dígitos.");
-      return false;
-    }
-  } else if (tipoID === "pasaporte") {
-    if (!/^[a-zA-Z0-9]{6,12}$/.test(identificacion)) {
-      alert("El pasaporte debe tener entre 6 y 12 caracteres alfanuméricos.");
-      return false;
-    }
-  } else {
-    alert("Debe seleccionar un tipo de identificación.");
-    return false;
-  }
-
-  // Guardar en array
-  const nuevoRUC = {
-    ruc,
-    razonSocial,
-    direccion,
-    celular,
-    correo,
-    tipoID,
-    identificacion
-  };
-
-  listaRUCs.push(nuevoRUC);
-
-  alert("Formulario enviado correctamente.");
-  return false; // Previene que el form recargue
-}
-
-
-// Actualiza el texto del placeholder según el tipo de identificación
-function actualizarPlaceholder() {
-  const tipo = document.getElementById("tipoIdentificacion").value;
-  const input = document.getElementById("identificacion");
-
-  if (tipo === "cedula") {
-    input.placeholder = "Número de Cédula (10 dígitos)";
-  } else if (tipo === "pasaporte") {
-    input.placeholder = "Número de Pasaporte (6 a 12 caracteres)";
-  } else {
-    input.placeholder = "Número de Cédula o Pasaporte";
-  }
-}
-
-//EDICION DE RUC
-function editarRUC() {
-  const contenido = document.getElementById("contenidoDIMM");
-
-  if (listaRUCs.length === 0) {
-    contenido.innerHTML = `<p>No hay RUCs registrados para editar.</p>`;
-    return;
-  }
-
-  let html = `<h3>Editar RUC</h3>`;
-  html += `<ul style="list-style: none; padding: 0;">`;
-
-  listaRUCs.forEach((rucObj, index) => {
-    html += `
-      <li style="margin-bottom: 10px; background: #f9f9f9; padding: 10px; border-radius: 6px;">
-        <strong>${rucObj.razonSocial}</strong> (${rucObj.ruc})
-        <br/>
-        <button onclick="cargarEdicionRUC(${index})">Editar</button>
-      </li>
-    `;
-  });
-
-  html += `</ul>`;
-  contenido.innerHTML = html;
-}
-
-function cargarEdicionRUC(index) {
-  const r = listaRUCs[index];
-  const contenido = document.getElementById("contenidoDIMM");
-
-  contenido.innerHTML = `
-    <h3>Editar RUC</h3>
-    <form onsubmit="return guardarCambiosRUC(${index})">
-      <input type="text" id="rucEdit" value="${r.ruc}" required /><br/>
-      <input type="text" id="razonSocialEdit" value="${r.razonSocial}" required /><br/>
-      <input type="text" id="direccionEdit" value="${r.direccion}" required /><br/>
-      <input type="text" id="celularEdit" value="${r.celular}" required /><br/>
-      <input type="email" id="correoEdit" value="${r.correo}" required /><br/>
-      <input type="text" id="identificacionEdit" value="${r.identificacion}" required /><br/>
-      <button type="submit">Guardar Cambios</button>
-    </form>
-  `;
-}
-
-//GUARDADO DE RUC EDITADO
-function guardarCambiosRUC(index) {
-  listaRUCs[index].ruc = document.getElementById("rucEdit").value.trim();
-  listaRUCs[index].razonSocial = document.getElementById("razonSocialEdit").value.trim();
-  listaRUCs[index].direccion = document.getElementById("direccionEdit").value.trim();
-  listaRUCs[index].celular = document.getElementById("celularEdit").value.trim();
-  listaRUCs[index].correo = document.getElementById("correoEdit").value.trim();
-  listaRUCs[index].identificacion = document.getElementById("identificacionEdit").value.trim();
-
-  alert("Cambios guardados correctamente.");
-  mostrar("dimm"); // Regresa a módulo
-  return false;
-}
-
-//ELIMINACION DE RUC
-function eliminarRUC() {
-  const contenido = document.getElementById("contenidoDIMM");
-
-  if (listaRUCs.length === 0) {
-    contenido.innerHTML = `<p>No hay RUCs registrados para eliminar.</p>`;
-    return;
-  }
-
-  let html = `<h3>Eliminar RUC</h3>`;
-  html += `<ul style="list-style: none; padding: 0;">`;
-
-  listaRUCs.forEach((rucObj, index) => {
-    html += `
-      <li style="margin-bottom: 10px; background: #fce9e9; padding: 10px; border-radius: 6px;">
-        <strong>${rucObj.razonSocial}</strong> (${rucObj.ruc})
-        <br/>
-        <button onclick="confirmarEliminarRUC(${index})" style="background-color: red;">Eliminar</button>
-      </li>
-    `;
-  });
-
-  html += `</ul>`;
-  contenido.innerHTML = html;
-}
-
-function confirmarEliminarRUC(index) {
-  if (confirm("¿Está seguro de eliminar este RUC?")) {
-    listaRUCs.splice(index, 1);
-    alert("RUC eliminado correctamente.");
-    eliminarRUC(); // Actualizar vista
-  }
-}
-
-
-//MOSTRAR MODULOS
-  function mostrar(modulo) {
-    const modulos = document.querySelectorAll('.modulo');
-    modulos.forEach(m => {
-      m.classList.add('hidden');
-      m.classList.remove('active');
-      m.style.display = 'none'; // Asegúrate de ocultar el módulo
-    });
-    const target = document.getElementById(modulo);
-    if (target) {
-      target.classList.remove('hidden');
-      target.classList.add('active');
-      target.style.display = 'block'; // Mostrar el módulo seleccionado
-    }
-  }
-
-let idEditar = null;
-
-// Mostrar módulo para crear/editar anexos, importar, descargar, enviar y eliminar
-function mostrarEnvioConsultaAnexos() {
-  mostrar('anexos');
-
-  const contenido = `
-    <div style="margin-top: 15px;">
-      <button onclick="mostrarFormNuevoAnexo()">Nuevo Anexo</button>
-      <button onclick="mostrarListaAnexos()">Lista de Anexos</button>
+  <!-- Módulo Facturación -->
+  <section id="facturacion" class="modulo" style="display: none;"> <!-- Asegúrate de que esté oculto por defecto -->
+    <h2>Autorización de Facturación</h2>
+    <div class="subopciones">
+      <button onclick="mostrarFacturacionFisica()">📄 Facturación Física</button>
+      <button onclick="mostrarFacturacionElectronica()">💻 Facturación Electrónica</button>
     </div>
 
-    <div id="formAnexo" style="display:none; margin-top: 15px;"></div>
-    <div id="listaAnexos" style="margin-top: 15px;"></div>
-  `;
 
-  document.getElementById('contenidoAnexos').innerHTML = contenido;
-
-  mostrarListaAnexos();
-}
-
-function mostrarFormNuevoAnexo() {
-  idEditar = null;
-  const formHtml = `
-    <h3 id="tituloForm">Crear Nuevo Anexo</h3>
-
-    <label>Importar archivo (.txt, .xls, .xlsx):</label><br/>
-    <input type="file" id="inputFileAnexo" accept=".txt, .xls, .xlsx" onchange="cargarArchivo(event)"/>
-
-    <label for="nombreAnexo">Nombre del anexo:</label>
-    <input type="text" id="nombreAnexo" placeholder="Ejemplo: anexo1.txt" style="width: 100%; padding: 8px; margin-bottom: 10px;"/>
-
-    <label for="contenidoAnexo">Contenido del anexo:</label>
-    <textarea id="contenidoAnexo" rows="10" style="width: 100%; padding: 8px;"></textarea>
-
-    <div style="margin-top: 10px;">
-      <button onclick="guardarAnexo()">Guardar</button>
-      <button onclick="limpiarForm()">Cancelar</button>
-    </div>
-  `;
-  document.getElementById('formAnexo').innerHTML = formHtml;
-  document.getElementById('formAnexo').style.display = 'block';
-  document.getElementById('listaAnexos').style.display = 'none';
-  limpiarForm();
-}
-
-function mostrarListaAnexos() {
-  document.getElementById('formAnexo').style.display = 'none';
-  document.getElementById('listaAnexos').style.display = 'block';
-  renderizarAnexos();
-}
-
-function limpiarForm() {
-  const fileInput = document.getElementById('inputFileAnexo');
-  if (fileInput) fileInput.value = '';
-  const nombre = document.getElementById('nombreAnexo');
-  if (nombre) nombre.value = '';
-  const contenido = document.getElementById('contenidoAnexo');
-  if (contenido) contenido.value = '';
-}
-
-// Cargar archivo .txt y excel para mostrar en el textarea y el nombre
-function cargarArchivo(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const nombreInput = document.getElementById('nombreAnexo');
-  const contenidoInput = document.getElementById('contenidoAnexo');
-
-  const ext = file.name.split('.').pop().toLowerCase();
-
-  if (ext === "txt") {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      contenidoInput.value = e.target.result;
-      nombreInput.value = file.name;
-    };
-    reader.readAsText(file);
-
-  } else if (ext === "xls" || ext === "xlsx") {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const data = e.target.result;
-        const workbook = XLSX.read(data, { type: "array" });
-        const primeraHoja = workbook.Sheets[workbook.SheetNames[0]];
-        const csv = XLSX.utils.sheet_to_csv(primeraHoja);
-        contenidoInput.value = csv;
-        nombreInput.value = file.name;
-      } catch (error) {
-        alert("Error al leer el archivo Excel: " + error.message);
-        nombreInput.value = "";
-        contenidoInput.value = "";
-      }
-    };
-    reader.readAsArrayBuffer(file);
-
-  } else {
-    alert("Solo se aceptan archivos .txt, .xls o .xlsx");
-    event.target.value = "";
-  }
-}
-
-function guardarAnexo() {
-  const nombre = document.getElementById('nombreAnexo').value.trim();
-  const contenido = document.getElementById('contenidoAnexo').value.trim();
-
-  if (!nombre) {
-    alert("Debe ingresar un nombre para el anexo");
-    return;
-  }
-  if (!contenido) {
-    alert("El contenido no puede estar vacío");
-    return;
-  }
-
-  if (idEditar === null) {
-    anexosGuardados.push({
-      id: Date.now(),
-      nombre,
-      contenido
-    });
-    alert("Anexo guardado con éxito");
-  } else {
-    const index = anexosGuardados.findIndex(a => a.id === idEditar);
-    if (index > -1) {
-      anexosGuardados[index].nombre = nombre;
-      anexosGuardados[index].contenido = contenido;
-      alert("Anexo actualizado con éxito");
-    }
-  }
-
-  limpiarForm();
-  mostrarListaAnexos();
-}
-
-function renderizarAnexos() {
-  const lista = document.getElementById("listaAnexos");
-  lista.innerHTML = "";
-
-  if (anexosGuardados.length === 0) {
-    lista.innerHTML = "<p>No hay anexos guardados.</p>";
-    return;
-  }
-
-  anexosGuardados.forEach(anexo => {
-    const div = document.createElement("div");
-    div.style.border = "1px solid #ccc";
-    div.style.padding = "10px";
-    div.style.marginBottom = "10px";
-    div.style.borderRadius = "5px";
-
-    div.innerHTML = `
-      <strong>Nombre:</strong> ${anexo.nombre}<br/><br/>
-      <pre style="background:#f4f4f4; padding:10px; border-radius:4px; max-height:150px; overflow:auto;">${anexo.contenido}</pre>
-      <div style="margin-top: 10px;">
-        <button onclick="editarAnexo(${anexo.id})">✏️ Editar</button>
-        <button onclick="descargarAnexo(${anexo.id})">📥 Descargar</button>
-        <button onclick="simularEnvio(${anexo.id})">📤 Enviar</button>
-        <button onclick="eliminarAnexo(${anexo.id})" style="color:red;">🗑️ Eliminar</button>
-      </div>
-    `;
-
-    lista.appendChild(div);
-  });
-}
-
-function editarAnexo(id) {
-  const anexo = anexosGuardados.find(a => a.id === id);
-  if (!anexo) return;
-
-  idEditar = id;
-  document.getElementById('tituloForm').innerText = "Editar Anexo";
-  mostrarFormNuevoAnexo();
-  document.getElementById('nombreAnexo').value = anexo.nombre;
-  document.getElementById('contenidoAnexo').value = anexo.contenido;
-}
-
-function descargarAnexo(id) {
-  const anexo = anexosGuardados.find(a => a.id === id);
-  if (!anexo) return;
-
-  const blob = new Blob([anexo.contenido], { type: "text/plain;charset=utf-8" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = anexo.nombre;
-  link.click();
-}
-
-function simularEnvio(id) {
-  const anexo = anexosGuardados.find(a => a.id === id);
-  if (!anexo) return;
-
-  alert(`El anexo "${anexo.nombre}" ha sido enviado con éxito.\nContenido:\n${anexo.contenido}`);
-}
-
-function eliminarAnexo(id) {
-  if (!confirm("¿Está seguro que desea eliminar este anexo?")) return;
-
-  anexosGuardados = anexosGuardados.filter(a => a.id !== id);
-  renderizarAnexos();
-}
-
-
-
-  function mostrarGastosPersonales() {
-  mostrar('anexos');
-
-  const contenido = `
-    <h3>Anexo de Gastos Personales</h3>
-    <p>Selecciona una opción:</p>
-    <button onclick="mostrarBeneficiario()">Beneficiario de pensión alimenticia</button>
-
-    <div id="contenidoBeneficiario" style="margin-top: 20px;"></div>
-  `;
-
-  document.getElementById('contenidoAnexos').innerHTML = contenido;
-}
-
-function mostrarBeneficiario() {
-  const contenedor = document.getElementById('contenidoBeneficiario');
-  contenedor.innerHTML = `
-    <h4>Verificación de Beneficiario</h4>
-    <label for="cedulaRuc">Ingrese RUC o Cédula:</label>
-    <input type="text" id="cedulaRuc" placeholder="Ej. 0102030405" maxlength="13"/>
-    <button onclick="verificarBeneficiario()">Verificar</button>
-    <div id="resultadoBeneficiario" style="margin-top: 10px;"></div>
-  `;
-}
-
-function verificarBeneficiario() {
-  const input = document.getElementById('cedulaRuc').value.trim();
-  const resultado = document.getElementById('resultadoBeneficiario');
-
-  if (!/^\d{10,13}$/.test(input)) {
-    resultado.innerHTML = `<p style="color: red;">❌ Ingrese un número válido de RUC o Cédula (10 o 13 dígitos).</p>`;
-    return;
-  }
-
-  const esBeneficiario = Math.random() < 0.5;
-
-  resultado.innerHTML = esBeneficiario
-    ? `<p style="color: green;">✅ El número ingresado SÍ es beneficiario de pensión alimenticia.</p>`
-    : `<p style="color: orange;">❌ El número ingresado NO es beneficiario de pensión alimenticia.</p>`;
-}
-
-
-  //FACTURACIÓN
-
-  
-
-// Facturación
-
-
-function mostrarFacturacionFisica() {
-  const contenedor = document.getElementById("facturacionFisica").style.display = "block";
-  document.getElementById("facturacionElectronica").style.display = "none";
-
-  contenedor.style.display = "block";
-  contenedor.innerHTML = `
+    <!-- Contenedor para Facturación Física -->
+  <div id="facturacionFisica" style="display:none; padding: 20px; background-color: #fff; border-radius: 8px; margin-top: 10px;">
     <h2>Facturación Física - Simulador SRI</h2>
     <form id="formFacturaFisica">
       <h4>Datos del Emisor</h4>
@@ -1162,776 +348,1367 @@ function mostrarFacturacionFisica() {
       <input type="number" placeholder="Cantidad" id="cantidad" required><br>
       <input type="number" placeholder="Precio Unitario" id="precio" required><br>
 
-      <button type="button" onclick="generarFacturaFisica()">📝 Generar Factura</button>
+      <button type="button" onclick="generarFacturaFisica()">📝 Generar Factura Física</button>
     </form>
-  `;
-}
-
-
-// Generador simple de número de factura
-function generarNumeroFactura() {
-  const aleatorio = Math.floor(Math.random() * 1000000).toString().padStart(6, "0");
-  return `001-001-${aleatorio}`;
-}
-
-// Simula generación de archivos .txt de autorización y factura
-function generarFacturaFisica() {
-  const emisor = document.getElementById("emisor").value;
-  const rucEmisor = document.getElementById("rucEmisor").value;
-  const direccionEmisor = document.getElementById("direccionEmisor").value;
-
-  const cliente = document.getElementById("cliente").value;
-  const rucCliente = document.getElementById("rucCliente").value;
-
-  const detalle = document.getElementById("detalle").value;
-  const cantidad = parseInt(document.getElementById("cantidad").value);
-  const precio = parseFloat(document.getElementById("precio").value);
-
-  const subtotal = cantidad * precio;
-  const iva = subtotal * 0.12;
-  const total = subtotal + iva;
-  const fecha = new Date().toLocaleDateString();
-  const numeroFactura = generarNumeroFactura();
-  const numAutorizacion = Math.floor(Math.random() * 99999999999999999999).toString().padStart(19, "0");
-
-  // Contenido de la autorización
-  const contenidoAutorizacion = `
-AUTORIZACIÓN SRI
--------------------------------
-RUC: ${rucEmisor}
-Número de autorización: ${numAutorizacion}
-Factura No.: ${numeroFactura}
-Fecha de autorización: ${fecha}
--------------------------------
-Este archivo es válido como constancia de autorización
-`;
-
-  // Contenido de la factura
-  const contenidoFactura = `
-FACTURA FÍSICA SRI SIMULADA
-------------------------------------------------
-Emisor: ${emisor}
-RUC: ${rucEmisor}
-Dirección: ${direccionEmisor}
-Factura No.: ${numeroFactura}
-Autorización SRI: ${numAutorizacion}
-Fecha: ${fecha}
-
-Cliente: ${cliente}
-CI/RUC: ${rucCliente}
-
-------------------------------------------------
-Detalle: ${detalle}
-Cantidad: ${cantidad}
-Precio Unitario: $${precio.toFixed(2)}
-Subtotal: $${subtotal.toFixed(2)}
-IVA 12%: $${iva.toFixed(2)}
-Total: $${total.toFixed(2)}
-------------------------------------------------
-"Este documento es válido para efectos tributarios"
-`;
-
-  descargarTxt("autorizacion_sri.txt", contenidoAutorizacion);
-  descargarTxt("factura_fisica.txt", contenidoFactura);
-}
-
-// Función para generar descarga de archivo .txt
-function descargarTxt(nombreArchivo, contenido) {
-  const blob = new Blob([contenido], { type: "text/plain" });
-  const enlace = document.createElement("a");
-  enlace.href = URL.createObjectURL(blob);
-  enlace.download = nombreArchivo;
-  enlace.click();
-}
-
-
-function mostrarFacturacionFisica() {
-  document.getElementById("facturacionFisica").style.display = "block";
-  document.getElementById("facturacionElectronica").style.display = "none";
-}
-
-function mostrarFacturacionElectronica() {
-  document.getElementById("facturacionFisica").style.display = "none";
-  document.getElementById("facturacionElectronica").style.display = "block";
-}
-
-function generarNumeroFactura() {
-  return `001-001-${Math.floor(Math.random() * 1000000).toString().padStart(6, "0")}`;
-}
-
-function descargarTxt(nombreArchivo, contenido) {
-  const blob = new Blob([contenido], { type: "text/plain" });
-  const enlace = document.createElement("a");
-  enlace.href = URL.createObjectURL(blob);
-  enlace.download = nombreArchivo;
-  enlace.click();
-}
-
-// Factura Física
-function generarFacturaFisica() {
-  const emisor = document.getElementById("emisor").value;
-  const rucEmisor = document.getElementById("rucEmisor").value;
-  const direccionEmisor = document.getElementById("direccionEmisor").value;
-  const cliente = document.getElementById("cliente").value;
-  const rucCliente = document.getElementById("rucCliente").value;
-  const detalle = document.getElementById("detalle").value;
-  const cantidad = parseInt(document.getElementById("cantidad").value);
-  const precio = parseFloat(document.getElementById("precio").value);
-
-  const subtotal = cantidad * precio;
-  const iva = subtotal * 0.12;
-  const total = subtotal + iva;
-  const fecha = new Date().toLocaleDateString();
-  const numeroFactura = generarNumeroFactura();
-  const numAutorizacion = Math.floor(Math.random() * 99999999999999999999).toString().padStart(19, "0");
-
-  const autorizacion = `
-AUTORIZACIÓN SRI
--------------------------------
-RUC: ${rucEmisor}
-Número de autorización: ${numAutorizacion}
-Factura No.: ${numeroFactura}
-Fecha de autorización: ${fecha}
--------------------------------
-Este archivo es válido como constancia de autorización
-`;
-
-  const factura = `
-FACTURA FÍSICA SRI SIMULADA
--------------------------------
-Emisor: ${emisor}
-RUC: ${rucEmisor}
-Dirección: ${direccionEmisor}
-Factura No.: ${numeroFactura}
-Autorización: ${numAutorizacion}
-Fecha: ${fecha}
-
-Cliente: ${cliente}
-CI/RUC: ${rucCliente}
-
-Detalle: ${detalle}
-Cantidad: ${cantidad}
-Precio Unitario: $${precio.toFixed(2)}
-Subtotal: $${subtotal.toFixed(2)}
-IVA 12%: $${iva.toFixed(2)}
-Total: $${total.toFixed(2)}
--------------------------------
-"Este documento es válido para efectos tributarios"
-`;
-
-  descargarTxt("autorizacion_fisica.txt", autorizacion);
-  descargarTxt("factura_fisica.txt", factura);
-}
-
-// Factura Electrónica
-function generarFacturaElectronica() {
-  const emisor = document.getElementById("emisorE").value;
-  const rucEmisor = document.getElementById("rucEmisorE").value;
-  const direccionEmisor = document.getElementById("direccionEmisorE").value;
-  const cliente = document.getElementById("clienteE").value;
-  const rucCliente = document.getElementById("rucClienteE").value;
-  const detalle = document.getElementById("detalleE").value;
-  const cantidad = parseInt(document.getElementById("cantidadE").value);
-  const precio = parseFloat(document.getElementById("precioE").value);
-
-  const subtotal = cantidad * precio;
-  const iva = subtotal * 0.12;
-  const total = subtotal + iva;
-
-  const fecha = new Date().toISOString().split('T')[0];
-  const numeroFactura = generarNumeroFactura();
-  const claveAcceso = Math.floor(10000000000000000000000000000000000000 + Math.random() * 90000000000000000000000000000000000000).toString();
-
-  const xml = `
-<factura id="comprobante" version="1.1.0">
-  <infoTributaria>
-    <razonSocial>${emisor}</razonSocial>
-    <ruc>${rucEmisor}</ruc>
-    <claveAcceso>${claveAcceso}</claveAcceso>
-    <codDoc>01</codDoc>
-    <estab>001</estab>
-    <ptoEmi>001</ptoEmi>
-    <secuencial>${numeroFactura.split('-')[2]}</secuencial>
-    <dirMatriz>${direccionEmisor}</dirMatriz>
-  </infoTributaria>
-  <infoFactura>
-    <fechaEmision>${fecha}</fechaEmision>
-    <dirEstablecimiento>${direccionEmisor}</dirEstablecimiento>
-    <razonSocialComprador>${cliente}</razonSocialComprador>
-    <identificacionComprador>${rucCliente}</identificacionComprador>
-    <totalSinImpuestos>${subtotal.toFixed(2)}</totalSinImpuestos>
-    <totalConImpuestos>
-      <totalImpuesto>
-        <codigo>2</codigo>
-        <codigoPorcentaje>2</codigoPorcentaje>
-        <baseImponible>${subtotal.toFixed(2)}</baseImponible>
-        <valor>${iva.toFixed(2)}</valor>
-      </totalImpuesto>
-    </totalConImpuestos>
-    <importeTotal>${total.toFixed(2)}</importeTotal>
-  </infoFactura>
-  <detalles>
-    <detalle>
-      <descripcion>${detalle}</descripcion>
-      <cantidad>${cantidad}</cantidad>
-      <precioUnitario>${precio.toFixed(2)}</precioUnitario>
-      <precioTotalSinImpuesto>${subtotal.toFixed(2)}</precioTotalSinImpuesto>
-    </detalle>
-  </detalles>
-</factura>
-`;
-
-  const autorizacion = `
-AUTORIZACIÓN SRI - FACTURACIÓN ELECTRÓNICA
---------------------------------------------
-RUC del Emisor: ${rucEmisor}
-Razón Social: ${emisor}
-Número de Factura: ${numeroFactura}
-Clave de Acceso: ${claveAcceso}
-Fecha de Autorización: ${fecha}
-Estado: AUTORIZADO
---------------------------------------------
-Este documento sirve como constancia de autorización electrónica por el SRI
-`;
-
-  descargarTxt("autorizacion_electronica.txt", autorizacion);
-  descargarTxt("factura_electronica.xml", xml);
-}
-
-const contenidoVehiculos = document.getElementById('contenidoVehiculos');
-  const reportes = [];
-
-  // Listas para generar datos aleatorios
-  const marcas = ['Toyota', 'Honda', 'Ford', 'Chevrolet', 'Nissan', 'Mazda', 'BMW', 'Kia', 'Hyundai', 'Volkswagen'];
-  const modelos = ['Corolla', 'Civic', 'Focus', 'Malibu', 'Sentra', '3', 'X5', 'Rio', 'Elantra', 'Golf'];
-  const motivos = ['Multa pendiente', 'Impuesto atrasado', 'Revisión técnica vencida', 'Seguro obligatorio vencido', 'Deuda por parqueo', 'Restricción legal'];
-
-  function aleatorioInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  function generarDatosAleatorios(valorBusqueda) {
-    const marca = marcas[aleatorioInt(0, marcas.length - 1)];
-    const modelo = modelos[aleatorioInt(0, modelos.length - 1)];
-    const anio = aleatorioInt(2000, new Date().getFullYear());
-    const motivoReporte = motivos[aleatorioInt(0, motivos.length -1)];
-    const valorReporte = (aleatorioInt(50, 500) + Math.random()).toFixed(2);
-
-    return {
-      placa: valorBusqueda.toUpperCase(),
-      marca: marca,
-      modelo: modelo,
-      anio: anio,
-      motivoReporte: motivoReporte,
-      valorReporte: parseFloat(valorReporte)
-    };
-  }
-
-
-  // Mostrar formulario para consulta
-  function mostrarConsultaVehiculo() {
-    contenidoVehiculos.innerHTML = `
-      <div style="margin-top:15px; background:#f5f8fc; padding:15px; border-radius:8px; max-width: 400px;">
-        <h3>Consulta de valores</h3>
-        <label for="tipoBusqueda">Selecciona tipo de búsqueda:</label>
-        <select id="tipoBusqueda" style="width:100%; padding:6px; margin-bottom:8px;">
-          <option value="placa">Placa</option>
-          <option value="ramv">RAMV</option>
-          <option value="cpn">CPN</option>
-          <option value="chasis">Chasis</option>
-        </select>
-        <input type="text" id="inputBusqueda" placeholder="Ej. AAA0123 o 13VW1234567890" style="width:100%; padding:6px; margin-bottom:8px;" />
-        <button id="btnValidar" style="background:#0c3a70; color:white; padding:8px 12px; border:none; border-radius:4px; cursor:pointer;">Validar</button>
-        <div id="resultadoConsulta" style="margin-top:15px;"></div>
-      </div>
-    `;
-
-    document.getElementById('btnValidar').addEventListener('click', () => {
-      const tipoBusqueda = document.getElementById('tipoBusqueda').value;
-      const valorBusqueda = document.getElementById('inputBusqueda').value.trim();
-
-      if (!valorBusqueda) {
-        alert('Por favor ingresa un valor para buscar.');
-        return;
-      }
-
-      const datos = generarDatosAleatorios(valorBusqueda);
-
-      const valorConDescuento = (datos.valorReporte * 0.88).toFixed(2);
-
-      const resultadoDiv = document.getElementById('resultadoConsulta');
-      resultadoDiv.innerHTML = `
-        <p><strong>Placa:</strong> ${datos.placa}</p>
-        <p><strong>Marca:</strong> ${datos.marca}</p>
-        <p><strong>Modelo:</strong> ${datos.modelo}</p>
-        <p><strong>Año:</strong> ${datos.anio}</p>
-        <p><strong>Motivo de reporte:</strong> ${datos.motivoReporte}</p>
-        <p><strong>Valor del reporte:</strong> $${datos.valorReporte.toFixed(2)}</p>
-        <p><strong>Valor a pagar con 12% descuento:</strong> $${valorConDescuento}</p>
-        <button id="btnGuardarReporte" style="background:#007b00; color:white; padding:8px 12px; border:none; border-radius:4px; cursor:pointer;">Guardar reporte</button>
-      `;
-
-
-      document.getElementById('btnGuardarReporte').addEventListener('click', () => {
-        const nuevoReporte = {
-          id: Date.now(),
-          placa: datos.placa,
-          marca: datos.marca,
-          modelo: datos.modelo,
-          anio: datos.anio,
-          motivoReporte: datos.motivoReporte,
-          valorReporte: datos.valorReporte,
-          valorAPagar: valorConDescuento
-        };
-
-        reportes.push(nuevoReporte);
-        alert('Reporte guardado correctamente.');
-        contenidoVehiculos.innerHTML = '';
-      });
-    });
-  }
-
-  // Mostrar reportes guardados
-  function mostrarReportePagoVehiculo() {
-    if(reportes.length === 0){
-      contenidoVehiculos.innerHTML = `<p style="margin-top:15px;">No hay reportes guardados.</p>`;
-      return;
-    }
-
-    let html = `<div style="margin-top:15px;">`;
-    reportes.forEach(rep => {
-      html += `
-        <div style="background:#e9f1fa; padding:12px; margin-bottom:12px; border-radius:6px; max-width: 400px;">
-          <p><strong>Placa:</strong> ${rep.placa}</p>
-          <p><strong>Marca:</strong> ${rep.marca}</p>
-          <p><strong>Modelo:</strong> ${rep.modelo}</p>
-          <p><strong>Año:</strong> ${rep.anio}</p>
-          <p><strong>Motivo:</strong> ${rep.motivoReporte}</p>
-          <p><strong>Valor a pagar:</strong> $${rep.valorAPagar}</p>
-          <button onclick="abrirModalPago(${rep.id})" style="margin-right:8px; background:#0c3a70; color:white; border:none; border-radius:4px; padding:6px 10px; cursor:pointer;">Pago por tarjeta de crédito</button>
-          <button onclick="generarBoletoPago(${rep.id})" style="background:#0a6f0a; color:white; border:none; border-radius:4px; padding:6px 10px; cursor:pointer;">Generar boleto de pago</button>
-        </div>
-      `;
-    });
-    html += `</div>`;
-
-    contenidoVehiculos.innerHTML = html;
-  }
-
-  // Modal pago tarjeta
-  let reporteSeleccionado = null;
-  function abrirModalPago(id) {
-    reporteSeleccionado = reportes.find(r => r.id === id);
-    if (!reporteSeleccionado) {
-      alert('Reporte no encontrado');
-      return;
-    }
-
-    // Crear modal si no existe
-    if (!document.getElementById('modalPagoTarjeta')) {
-      const modalHtml = `
-        <div id="modalPagoTarjeta" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);
-          display:flex; justify-content:center; align-items:center; z-index:1000;">
-          <div style="background:#fff; padding:20px; border-radius:8px; width:320px; position:relative;">
-            <h3>Pago con tarjeta de crédito</h3>
-            <label>Número de tarjeta (16 dígitos)</label>
-            <input type="text" id="tarjetaNumero" maxlength="16" placeholder="1234 5678 9012 3456" style="width:100%; padding:6px; margin-bottom:8px;" />
-            <label>Código de seguridad (CVV)</label>
-            <input type="text" id="tarjetaCVV" maxlength="3" placeholder="123" style="width:100%; padding:6px; margin-bottom:8px;" />
-            <label>Fecha de vencimiento (MM/AA)</label>
-            <input type="text" id="tarjetaVence" maxlength="5" placeholder="12/24" style="width:100%; padding:6px; margin-bottom:8px;" />
-            <button id="btnPagarTarjeta" style="background:#0c3a70; color:white; border:none; border-radius:4px; padding:8px 12px; cursor:pointer;">Pagar</button>
-            <button id="btnCerrarModal" style="margin-top:10px; background:#aaa; color:#333; border:none; border-radius:4px; padding:8px 12px; width:100%; cursor:pointer;">Cerrar</button>
-          </div>
-        </div>
-      `;
-      document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-      document.getElementById('btnCerrarModal').addEventListener('click', cerrarModalPago);
-      document.getElementById('btnPagarTarjeta').addEventListener('click', realizarPago);
-    }
-
-    document.getElementById('modalPagoTarjeta').style.display = 'flex';
-    // Limpiar inputs
-    document.getElementById('tarjetaNumero').value = '';
-    document.getElementById('tarjetaCVV').value = '';
-    document.getElementById('tarjetaVence').value = '';
-  }
-
-  function cerrarModalPago() {
-    document.getElementById('modalPagoTarjeta').style.display = 'none';
-  }
-
-  function realizarPago() {
-  const num = document.getElementById('tarjetaNumero').value.trim();
-  const cvv = document.getElementById('tarjetaCVV').value.trim();
-  const vence = document.getElementById('tarjetaVence').value.trim();
-
-  // Validaciones
-  if (!/^\d{16}$/.test(num)) {
-    alert('Número de tarjeta inválido. Debe tener 16 dígitos.');
-    return;
-  }
-
-  if (!/^\d{3}$/.test(cvv)) {
-    alert('Código CVV inválido. Debe tener exactamente 3 dígitos.');
-    return;
-  }
-
-  if (!/^\d{2}\/\d{2}$/.test(vence)) {
-    alert('Fecha de vencimiento inválida. Use formato MM/AA.');
-    return;
-  }
-
-  const [mesStr, anioStr] = vence.split('/');
-  const mes = parseInt(mesStr, 10);
-  const anio = parseInt('20' + anioStr, 10);
-
-  if (mes < 1 || mes > 12) {
-    alert('Mes inválido. Debe estar entre 01 y 12.');
-    return;
-  }
-
-  if (anio > 2026) {
-    alert('Año inválido. Solo se permiten tarjetas hasta 2026.');
-    return;
-  }
-
-  // Pago exitoso
-  alert(`✅ Pago realizado exitosamente para la placa ${reporteSeleccionado.placa}.`);
-
-  // Eliminar el reporte del arreglo
-  reportes.splice(reportes.findIndex(r => r.id === reporteSeleccionado.id), 1);
-
-  // Cerrar y actualizar vista
-  cerrarModalPago();
-  mostrarReportePagoVehiculo();
-}
-
-
-  function generarBoletoPago(id) {
-  const reporte = reportes.find(r => r.id === id);
-  if (!reporte) {
-    alert('Reporte no encontrado.');
-    return;
-  }
-
-  const contenido = `
-    ====== BOLETO DE PAGO ======
-    Placa: ${reporte.placa}
-    Marca: ${reporte.marca}
-    Modelo: ${reporte.modelo}
-    Año: ${reporte.anio}
-    Motivo: ${reporte.motivoReporte}
-    Valor a pagar: $${reporte.valorAPagar}
-
-    Cuenta Institucional Gobierno:
-    Banco: Banco del Estado
-    Número de cuenta: 1234567890
-    Tipo de cuenta: Corriente
-
-    Para realizar el pago, use su banca electrónica o acuda al banco con esta información.
-    Fecha de emisión: ${new Date().toLocaleDateString()}
-  `;
-
-  // Crear archivo txt para descarga
-  const blob = new Blob([contenido], { type: 'text/plain' });
-  const enlace = document.createElement('a');
-  enlace.href = URL.createObjectURL(blob);
-  enlace.download = `boleto_pago_${reporte.placa}.txt`;
-  document.body.appendChild(enlace);
-  enlace.click();
-  document.body.removeChild(enlace);
-
-  // Eliminar reporte del array
-  reportes.splice(reportes.findIndex(r => r.id === id), 1);
-
-  // Actualizar la vista
-  mostrarReportePagoVehiculo();
-}
-
-
-
-  // Simulación de datos base (podrías conectar con tus arrays reales más adelante)
-  // 🟦 Valores iniciales
-  let datosSistema = {
-    facturas: Math.floor(Math.random() * 3001) + 2000,
-    anexos: Math.floor(Math.random() * 3001) + 2000,
-    deudas: Math.floor(Math.random() * 3001) + 2000,
-    reportesVehiculos: Math.floor(Math.random() * 3001) + 2000
-  };
-
-  function generarVariacionPorcentaje(valor) {
-    const variacion = Math.floor(valor * 0.15);
-    const cambio = Math.floor(Math.random() * (variacion + 1));
-    const suma = Math.random() < 0.5 ? -cambio : cambio;
-    return Math.max(0, valor + suma);
-  }
-
-  function obtenerDatosVariables() {
-    return {
-      facturas: generarVariacionPorcentaje(datosSistema.facturas),
-      anexos: generarVariacionPorcentaje(datosSistema.anexos),
-      deudas: generarVariacionPorcentaje(datosSistema.deudas),
-      reportesVehiculos: generarVariacionPorcentaje(datosSistema.reportesVehiculos)
-    };
-  }
-
-  let graficaSistema = null;
-  let intervaloGrafica = null;
-
-  function mostrarGrafica() {
-    document.querySelectorAll('.modulo').forEach(m => m.classList.add('hidden'));
-    document.getElementById('grafica').classList.remove('hidden');
-
-    const ctx = document.getElementById('graficaSistema').getContext('2d');
-    const datosIniciales = obtenerDatosVariables();
-
-    graficaSistema = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: [
-          'Facturas Generadas',
-          'Anexos Procesados',
-          'Deudas Registradas',
-          'Reportes de Vehículos'
-        ],
-        datasets: [{
-          label: 'Cantidad total',
-          data: [
-            datosIniciales.facturas,
-            datosIniciales.anexos,
-            datosIniciales.deudas,
-            datosIniciales.reportesVehiculos
-          ],
-          backgroundColor: ['#007bff88', '#28a74588', '#ffc10788', '#dc354588'],
-          borderColor: ['#007bff', '#28a745', '#ffc107', '#dc3545'],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        animation: {
-          duration: 1000,
-          easing: 'easeInOutQuart'
-        },
-        plugins: {
-          title: {
-            display: true,
-            text: 'Resumen General del Sistema'
-          },
-          legend: {
-            display: false
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              precision: 0
+  </div>
+
+  <!-- Contenedor para Facturación Electrónica -->
+  <div id="facturacionElectronica" style="display:none; padding: 20px; background-color: #eef; border-radius: 8px; margin-top: 10px;">
+    <h2>Facturación Electrónica - Simulador SRI</h2>
+    <form id="formFacturaElectronica">
+      <h4>Datos del Emisor</h4>
+      <input type="text" placeholder="Razón Social" id="emisorE" required><br>
+      <input type="text" placeholder="RUC" id="rucEmisorE" required><br>
+      <input type="text" placeholder="Dirección" id="direccionEmisorE" required><br>
+
+      <h4>Datos del Cliente</h4>
+      <input type="text" placeholder="Nombre del Cliente" id="clienteE" required><br>
+      <input type="text" placeholder="Cédula/RUC Cliente" id="rucClienteE" required><br>
+
+      <h4>Detalle de la Factura</h4>
+      <input type="text" placeholder="Producto o Servicio" id="detalleE" required><br>
+      <input type="number" placeholder="Cantidad" id="cantidadE" required><br>
+      <input type="number" placeholder="Precio Unitario" id="precioE" required><br>
+
+      <button type="button" onclick="generarFacturaElectronica()">📤 Emitir Factura Electrónica</button>
+    </form>
+  </div>
+
+
+  </section>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+          //VARIABLES 
+          let listaRUCs = []; 
+          let registrosDIMM = [];
+          let anexosGuardados = [];
+
+
+          
+
+
+
+          //INICIO DE SECCION
+
+          function attemptLogin() {
+            const username = document.getElementById('inputUsername').value;
+            const password = document.getElementById('inputPassword').value;
+            const errorMessage = document.getElementById('error-message');
+            
+            errorMessage.style.display = 'none';
+            
+            if(username === 'Lis' && password === '12345') {
+                console.log("Inicio de sesión correcto");
+                
+                // Ocultar login box con animación
+                document.getElementById('login-box').classList.add('hidden');
+                
+                // Mostrar contenido principal después de la animación
+                setTimeout(() => {
+                    document.getElementById('login-container').style.display = 'none';
+                    document.getElementById('main-content').style.display = 'block';
+                    document.getElementById('username-display').textContent = username;
+                }, 300);
+            } else {
+                console.warn("Fallo en inicio de sesión");
+                errorMessage.style.display = 'block';
+                document.getElementById('inputPassword').value = '';
             }
           }
+
+
+          function cerrarSesion() {
+            // Mostrar login container
+            document.getElementById('login-container').style.display = 'flex';
+            document.getElementById('main-content').style.display = 'none';
+            
+            // Limpiar campos y mostrar login box con animación
+            document.getElementById('inputUsername').value = '';
+            document.getElementById('inputPassword').value = '';
+            document.getElementById('error-message').style.display = 'none';
+            
+            setTimeout(() => {
+                document.getElementById('login-box').classList.remove('hidden');
+            }, 50);
+          }
+
+
+          // SECCIÓN RUC - Generación del formulario
+      function nuevoRUC() {
+        const contenido = document.getElementById("contenidoDIMM");
+
+        contenido.innerHTML = `
+          <div id="formularioRUC" class="form-card">
+            <h3 class="form-title">Registrar RUC</h3>
+            <form onsubmit="return validarFormularioRUC()" class="form-body">
+              <div class="form-group">
+                <input type="text" id="ruc" placeholder="RUC (13 dígitos)" required />
+              </div>
+              <div class="form-group">
+                <input type="text" id="razonSocial" placeholder="Razón Social" required />
+              </div>
+              <div class="form-group">
+                <input type="text" id="direccion" placeholder="Dirección Matriz" required />
+              </div>
+              <div class="form-group">
+                <input type="text" id="celular" placeholder="Número Celular (10 dígitos)" required />
+              </div>
+              <div class="form-group">
+                <input type="email" id="correo" placeholder="Correo Electrónico" required />
+              </div>
+              <div class="form-group">
+                <select id="tipoIdentificacion" required onchange="actualizarPlaceholder()">
+                  <option value="">Seleccione tipo de identificación</option>
+                  <option value="cedula">Cédula</option>
+                  <option value="pasaporte">Pasaporte</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <input type="text" id="identificacion" placeholder="Número de Cédula o Pasaporte" required />
+              </div>
+              <div class="form-group">
+                <button type="submit">Registrar</button>
+              </div>
+            </form>
+          </div>
+        `;
+      }
+
+
+      // Validación del formulario RUC
+      function validarFormularioRUC() {
+        const ruc = document.getElementById('ruc').value.trim();
+        const razonSocial = document.getElementById('razonSocial').value.trim();
+        const direccion = document.getElementById('direccion').value.trim();
+        const celular = document.getElementById('celular').value.trim();
+        const correo = document.getElementById('correo').value.trim();
+        const tipoID = document.getElementById('tipoIdentificacion').value;
+        const identificacion = document.getElementById('identificacion').value.trim();
+
+        // Validaciones...
+        if (!/^\d{13}$/.test(ruc) || !ruc.endsWith("001")) {
+          alert("El RUC debe tener 13 dígitos numéricos y terminar en '001'.");
+          return false;
+        }
+        if (razonSocial.length < 3) {
+          alert("La razón social debe tener al menos 3 caracteres.");
+          return false;
+        }
+        if (direccion.length < 5) {
+          alert("La dirección matriz debe tener al menos 5 caracteres.");
+          return false;
+        }
+        if (!/^09\d{8}$/.test(celular)) {
+          alert("El número celular debe tener 10 dígitos y comenzar con '09'.");
+          return false;
+        }
+        const correoRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.([a-z]{2,}|com|net|org|edu|ec|gob\.ec)$/i;
+        if (!correoRegex.test(correo)) {
+          alert("El correo debe tener un formato válido y usar un dominio permitido.");
+          return false;
+        }
+        if (tipoID === "cedula") {
+          if (!/^\d{10}$/.test(identificacion)) {
+            alert("La cédula debe tener exactamente 10 dígitos.");
+            return false;
+          }
+        } else if (tipoID === "pasaporte") {
+          if (!/^[a-zA-Z0-9]{6,12}$/.test(identificacion)) {
+            alert("El pasaporte debe tener entre 6 y 12 caracteres alfanuméricos.");
+            return false;
+          }
+        } else {
+          alert("Debe seleccionar un tipo de identificación.");
+          return false;
+        }
+
+        // Guardar en array
+        const nuevoRUC = {
+          ruc,
+          razonSocial,
+          direccion,
+          celular,
+          correo,
+          tipoID,
+          identificacion
+        };
+
+        listaRUCs.push(nuevoRUC);
+
+        alert("Formulario enviado correctamente.");
+        return false; // Previene que el form recargue
+      }
+
+
+      // Actualiza el texto del placeholder según el tipo de identificación
+      function actualizarPlaceholder() {
+        const tipo = document.getElementById("tipoIdentificacion").value;
+        const input = document.getElementById("identificacion");
+
+        if (tipo === "cedula") {
+          input.placeholder = "Número de Cédula (10 dígitos)";
+        } else if (tipo === "pasaporte") {
+          input.placeholder = "Número de Pasaporte (6 a 12 caracteres)";
+        } else {
+          input.placeholder = "Número de Cédula o Pasaporte";
         }
       }
-    });
 
-    // Evita múltiples intervalos
-    if (intervaloGrafica) clearInterval(intervaloGrafica);
+      //EDICION DE RUC
+      function editarRUC() {
+        const contenido = document.getElementById("contenidoDIMM");
 
-    intervaloGrafica = setInterval(() => {
-      const nuevosDatos = obtenerDatosVariables();
-      const nuevosValores = [
-        nuevosDatos.facturas,
-        nuevosDatos.anexos,
-        nuevosDatos.deudas,
-        nuevosDatos.reportesVehiculos
-      ];
+        if (listaRUCs.length === 0) {
+          contenido.innerHTML = `<p>No hay RUCs registrados para editar.</p>`;
+          return;
+        }
 
-      // 🔄 Actualiza solo los datos sin destruir la gráfica
-      graficaSistema.data.datasets[0].data = nuevosValores;
-      graficaSistema.update();
-    }, 6000);
-  }
+        let html = `<h3>Editar RUC</h3>`;
+        html += `<ul style="list-style: none; padding: 0;">`;
 
+        listaRUCs.forEach((rucObj, index) => {
+          html += `
+            <li style="margin-bottom: 10px; background: #f9f9f9; padding: 10px; border-radius: 6px;">
+              <strong>${rucObj.razonSocial}</strong> (${rucObj.ruc})
+              <br/>
+              <button onclick="cargarEdicionRUC(${index})">Editar</button>
+            </li>
+          `;
+        });
 
-let deudasUsuario = [];
-
-  function mostrarConsultaDeudas() {
-    // Limpiar contenido y deshabilitar botones pagar/facilidades
-    document.getElementById("contenidoDeudas").innerHTML = `
-      <h3>Consulta de Deudas</h3>
-      <label>Cédula/RUC:</label>
-      <input type="text" id="cedulaConsulta" placeholder="Ej: 0102030405">
-      <button onclick="validarConsultaDeudas()">Consultar</button>
-      <div id="resultadoConsulta" style="margin-top: 10px;"></div>
-    `;
-    document.getElementById("btnPagarDeudas").disabled = true;
-    document.getElementById("btnFacilidadesPago").disabled = true;
-  }
-
-  function validarConsultaDeudas() {
-    const cedula = document.getElementById("cedulaConsulta").value.trim();
-    const resultadoDiv = document.getElementById("resultadoConsulta");
-
-    if (cedula.length < 10) {
-      alert("Por favor ingresa un número válido de cédula o RUC.");
-      return;
-    }
-
-    // Simulación de consulta: Generamos aleatoriamente si hay o no deuda
-    const tieneDeuda = Math.random() < 0.6; // 60% probabilidad de deuda
-
-    if (!tieneDeuda) {
-      deudasUsuario = []; // Vaciar listado
-      resultadoDiv.innerHTML = `<p style="color:green;">No tiene deudas registradas para el RUC/Cédula ${cedula}.</p>`;
-      document.getElementById("btnPagarDeudas").disabled = true;
-      document.getElementById("btnFacilidadesPago").disabled = true;
-      return;
-    }
-
-    // Si tiene deudas, simulamos un listado (puedes ajustar estos datos)
-    deudasUsuario = [
-      { id: "D001", descripcion: "Impuesto Renta 2024", monto: 350.00 },
-      { id: "D002", descripcion: "Multa por declaración tardía", monto: 50.00 },
-    ];
-
-    let htmlReporte = `<p style="color:red;">Se encontraron ${deudasUsuario.length} deudas para el RUC/Cédula ${cedula}:</p><ul>`;
-    deudasUsuario.forEach(deuda => {
-      htmlReporte += `<li><strong>${deuda.descripcion}</strong> - $${deuda.monto.toFixed(2)} (ID: ${deuda.id})</li>`;
-    });
-    htmlReporte += "</ul>";
-
-    resultadoDiv.innerHTML = htmlReporte;
-
-    // Habilitar botones de pago y facilidades
-    document.getElementById("btnPagarDeudas").disabled = false;
-    document.getElementById("btnFacilidadesPago").disabled = false;
-  }
-
-  function mostrarPagoDeudas() {
-    if(deudasUsuario.length === 0){
-      alert("No hay deudas registradas para pagar.");
-      return;
-    }
-
-    let contenido = `
-      <h3>Pagar Deudas</h3>
-      <label>Selecciona la deuda a pagar:</label>
-      <select id="selectDeudaPago">
-        ${deudasUsuario.map(d => `<option value="${d.id}">${d.descripcion} - $${d.monto.toFixed(2)}</option>`).join('')}
-      </select>
-      <label>Monto a pagar:</label>
-      <input type="number" id="montoPago" min="0.01" step="0.01" placeholder="Ej: 100.00" value="${deudasUsuario[0].monto.toFixed(2)}">
-      <button onclick="validarPagoDeudas()">Pagar</button>
-      <div id="mensajePago" style="margin-top:10px;"></div>
-    `;
-
-    document.getElementById("contenidoDeudas").innerHTML = contenido;
-
-    // Al cambiar deuda seleccionada, actualizar monto automáticamente
-    document.getElementById("selectDeudaPago").addEventListener('change', function(){
-      const selectedId = this.value;
-      const deuda = deudasUsuario.find(d => d.id === selectedId);
-      if(deuda){
-        document.getElementById("montoPago").value = deuda.monto.toFixed(2);
+        html += `</ul>`;
+        contenido.innerHTML = html;
       }
-    });
-  }
 
-  function validarPagoDeudas() {
-    const id = document.getElementById("selectDeudaPago").value;
-    const montoInput = document.getElementById("montoPago").value;
-    const monto = parseFloat(montoInput);
-    const mensajeDiv = document.getElementById("mensajePago");
+      function cargarEdicionRUC(index) {
+        const r = listaRUCs[index];
+        const contenido = document.getElementById("contenidoDIMM");
 
-    if (!id || isNaN(monto) || monto <= 0) {
-      alert("Completa correctamente los campos para procesar el pago.");
-      return;
-    }
+        contenido.innerHTML = `
+          <h3>Editar RUC</h3>
+          <form onsubmit="return guardarCambiosRUC(${index})">
+            <input type="text" id="rucEdit" value="${r.ruc}" required /><br/>
+            <input type="text" id="razonSocialEdit" value="${r.razonSocial}" required /><br/>
+            <input type="text" id="direccionEdit" value="${r.direccion}" required /><br/>
+            <input type="text" id="celularEdit" value="${r.celular}" required /><br/>
+            <input type="email" id="correoEdit" value="${r.correo}" required /><br/>
+            <input type="text" id="identificacionEdit" value="${r.identificacion}" required /><br/>
+            <button type="submit">Guardar Cambios</button>
+          </form>
+        `;
+      }
 
-    const deuda = deudasUsuario.find(d => d.id === id);
-    if (!deuda) {
-      alert("Deuda no encontrada.");
-      return;
-    }
+      //GUARDADO DE RUC EDITADO
+      function guardarCambiosRUC(index) {
+        listaRUCs[index].ruc = document.getElementById("rucEdit").value.trim();
+        listaRUCs[index].razonSocial = document.getElementById("razonSocialEdit").value.trim();
+        listaRUCs[index].direccion = document.getElementById("direccionEdit").value.trim();
+        listaRUCs[index].celular = document.getElementById("celularEdit").value.trim();
+        listaRUCs[index].correo = document.getElementById("correoEdit").value.trim();
+        listaRUCs[index].identificacion = document.getElementById("identificacionEdit").value.trim();
 
-    if (monto > deuda.monto) {
-      alert(`El monto a pagar no puede ser mayor al total de la deuda ($${deuda.monto.toFixed(2)}).`);
-      return;
-    }
+        alert("Cambios guardados correctamente.");
+        mostrar("dimm"); // Regresa a módulo
+        return false;
+      }
 
-    // Simular pago parcial o total
-    deuda.monto -= monto;
+      //ELIMINACION DE RUC
+      function eliminarRUC() {
+        const contenido = document.getElementById("contenidoDIMM");
 
-    let msg = `Pago realizado por $${monto.toFixed(2)} para la deuda "${deuda.descripcion}". `;
+        if (listaRUCs.length === 0) {
+          contenido.innerHTML = `<p>No hay RUCs registrados para eliminar.</p>`;
+          return;
+        }
 
-    if (deuda.monto <= 0.01) {
-      // Eliminar deuda si saldo es 0 o menor
-      deudasUsuario = deudasUsuario.filter(d => d.id !== id);
-      msg += "Deuda saldada completamente.";
-    } else {
-      msg += `Saldo restante: $${deuda.monto.toFixed(2)}.`;
-    }
+        let html = `<h3>Eliminar RUC</h3>`;
+        html += `<ul style="list-style: none; padding: 0;">`;
 
-    mensajeDiv.innerHTML = `<p style="color:green;">${msg}</p>`;
+        listaRUCs.forEach((rucObj, index) => {
+          html += `
+            <li style="margin-bottom: 10px; background: #fce9e9; padding: 10px; border-radius: 6px;">
+              <strong>${rucObj.razonSocial}</strong> (${rucObj.ruc})
+              <br/>
+              <button onclick="confirmarEliminarRUC(${index})" style="background-color: red;">Eliminar</button>
+            </li>
+          `;
+        });
 
-    // Actualizar select y monto
-    if(deudasUsuario.length === 0){
-      document.getElementById("contenidoDeudas").innerHTML = `<p>No quedan deudas pendientes.</p>`;
-      document.getElementById("btnPagarDeudas").disabled = true;
-      document.getElementById("btnFacilidadesPago").disabled = true;
-    } else {
-      mostrarPagoDeudas();
-    }
-  }
+        html += `</ul>`;
+        contenido.innerHTML = html;
+      }
 
-  function mostrarFacilidadesPago() {
-    if(deudasUsuario.length === 0){
-      alert("No hay deudas registradas para solicitar facilidades.");
-      return;
-    }
-
-    let contenido = `
-      <h3>Solicitar Facilidades de Pago</h3>
-      <label>Cédula/RUC:</label>
-      <input type="text" id="cedulaFacilidad" placeholder="Ej: 0102030405">
-      <label>Cuotas:</label>
-      <input type="number" id="cuotas" min="1" placeholder="Ej: 6">
-      <button onclick="validarFacilidadesPago()">Solicitar</button>
-      <div id="mensajeFacilidad" style="margin-top:10px;"></div>
-    `;
-
-    document.getElementById("contenidoDeudas").innerHTML = contenido;
-  }
-
-  function validarFacilidadesPago() {
-    const cedula = document.getElementById("cedulaFacilidad").value.trim();
-    const cuotas = parseInt(document.getElementById("cuotas").value);
-    const mensajeDiv = document.getElementById("mensajeFacilidad");
-
-    if (cedula.length < 10) {
-      alert("Por favor ingresa un número válido de cédula o RUC.");
-      return;
-    }
-    if (isNaN(cuotas) || cuotas < 1) {
-      alert("Ingresa un número válido de cuotas.");
-      return;
-    }
-    if (deudasUsuario.length === 0) {
-      alert("No hay deudas para solicitar facilidades de pago.");
-      return;
-    }
-
-    mensajeDiv.innerHTML = `<p style="color:green;">Solicitud enviada para ${cuotas} cuotas al RUC/Cédula ${cedula}. (Simulación)</p>`;
-  }
+      function confirmarEliminarRUC(index) {
+        if (confirm("¿Está seguro de eliminar este RUC?")) {
+          listaRUCs.splice(index, 1);
+          alert("RUC eliminado correctamente.");
+          eliminarRUC(); // Actualizar vista
+        }
+      }
 
 
+      //MOSTRAR MODULOS
+        function mostrar(modulo) {
+          const modulos = document.querySelectorAll('.modulo');
+          modulos.forEach(m => {
+            m.classList.add('hidden');
+            m.classList.remove('active');
+            m.style.display = 'none'; // Asegúrate de ocultar el módulo
+          });
+          const target = document.getElementById(modulo);
+          if (target) {
+            target.classList.remove('hidden');
+            target.classList.add('active');
+            target.style.display = 'block'; // Mostrar el módulo seleccionado
+          }
+        }
 
-  </script>
-</body>
-<footer  style="text-align: center; padding: 10px; background: #004b8d; color: white; position: fixed; bottom: 0; width: 100%;">
-  © 2025 Sistema Web SRI
-</footer>
+      let idEditar = null;
+
+      // Mostrar módulo para crear/editar anexos, importar, descargar, enviar y eliminar
+      function mostrarEnvioConsultaAnexos() {
+        mostrar('anexos');
+
+        const contenido = `
+          <div style="margin-top: 15px;">
+            <button onclick="mostrarFormNuevoAnexo()">Nuevo Anexo</button>
+            <button onclick="mostrarListaAnexos()">Lista de Anexos</button>
+          </div>
+
+          <div id="formAnexo" style="display:none; margin-top: 15px;"></div>
+          <div id="listaAnexos" style="margin-top: 15px;"></div>
+        `;
+
+        document.getElementById('contenidoAnexos').innerHTML = contenido;
+
+        mostrarListaAnexos();
+      }
+
+      function mostrarFormNuevoAnexo() {
+        idEditar = null;
+        const formHtml = `
+          <h3 id="tituloForm">Crear Nuevo Anexo</h3>
+
+          <label>Importar archivo (.txt, .xls, .xlsx):</label><br/>
+          <input type="file" id="inputFileAnexo" accept=".txt, .xls, .xlsx" onchange="cargarArchivo(event)"/>
+
+          <label for="nombreAnexo">Nombre del anexo:</label>
+          <input type="text" id="nombreAnexo" placeholder="Ejemplo: anexo1.txt" style="width: 100%; padding: 8px; margin-bottom: 10px;"/>
+
+          <label for="contenidoAnexo">Contenido del anexo:</label>
+          <textarea id="contenidoAnexo" rows="10" style="width: 100%; padding: 8px;"></textarea>
+
+          <div style="margin-top: 10px;">
+            <button onclick="guardarAnexo()">Guardar</button>
+            <button onclick="limpiarForm()">Cancelar</button>
+          </div>
+        `;
+        document.getElementById('formAnexo').innerHTML = formHtml;
+        document.getElementById('formAnexo').style.display = 'block';
+        document.getElementById('listaAnexos').style.display = 'none';
+        limpiarForm();
+      }
+
+      function mostrarListaAnexos() {
+        document.getElementById('formAnexo').style.display = 'none';
+        document.getElementById('listaAnexos').style.display = 'block';
+        renderizarAnexos();
+      }
+
+      function limpiarForm() {
+        const fileInput = document.getElementById('inputFileAnexo');
+        if (fileInput) fileInput.value = '';
+        const nombre = document.getElementById('nombreAnexo');
+        if (nombre) nombre.value = '';
+        const contenido = document.getElementById('contenidoAnexo');
+        if (contenido) contenido.value = '';
+      }
+
+      // Cargar archivo .txt y excel para mostrar en el textarea y el nombre
+      function cargarArchivo(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const nombreInput = document.getElementById('nombreAnexo');
+        const contenidoInput = document.getElementById('contenidoAnexo');
+
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        if (ext === "txt") {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            contenidoInput.value = e.target.result;
+            nombreInput.value = file.name;
+          };
+          reader.readAsText(file);
+
+        } else if (ext === "xls" || ext === "xlsx") {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            try {
+              const data = e.target.result;
+              const workbook = XLSX.read(data, { type: "array" });
+              const primeraHoja = workbook.Sheets[workbook.SheetNames[0]];
+              const csv = XLSX.utils.sheet_to_csv(primeraHoja);
+              contenidoInput.value = csv;
+              nombreInput.value = file.name;
+            } catch (error) {
+              alert("Error al leer el archivo Excel: " + error.message);
+              nombreInput.value = "";
+              contenidoInput.value = "";
+            }
+          };
+          reader.readAsArrayBuffer(file);
+
+        } else {
+          alert("Solo se aceptan archivos .txt, .xls o .xlsx");
+          event.target.value = "";
+        }
+      }
+
+      function guardarAnexo() {
+        const nombre = document.getElementById('nombreAnexo').value.trim();
+        const contenido = document.getElementById('contenidoAnexo').value.trim();
+
+        if (!nombre) {
+          alert("Debe ingresar un nombre para el anexo");
+          return;
+        }
+        if (!contenido) {
+          alert("El contenido no puede estar vacío");
+          return;
+        }
+
+        if (idEditar === null) {
+          anexosGuardados.push({
+            id: Date.now(),
+            nombre,
+            contenido
+          });
+          alert("Anexo guardado con éxito");
+        } else {
+          const index = anexosGuardados.findIndex(a => a.id === idEditar);
+          if (index > -1) {
+            anexosGuardados[index].nombre = nombre;
+            anexosGuardados[index].contenido = contenido;
+            alert("Anexo actualizado con éxito");
+          }
+        }
+
+        limpiarForm();
+        mostrarListaAnexos();
+      }
+
+      function renderizarAnexos() {
+        const lista = document.getElementById("listaAnexos");
+        lista.innerHTML = "";
+
+        if (anexosGuardados.length === 0) {
+          lista.innerHTML = "<p>No hay anexos guardados.</p>";
+          return;
+        }
+
+        anexosGuardados.forEach(anexo => {
+          const div = document.createElement("div");
+          div.style.border = "1px solid #ccc";
+          div.style.padding = "10px";
+          div.style.marginBottom = "10px";
+          div.style.borderRadius = "5px";
+
+          div.innerHTML = `
+            <strong>Nombre:</strong> ${anexo.nombre}<br/><br/>
+            <pre style="background:#f4f4f4; padding:10px; border-radius:4px; max-height:150px; overflow:auto;">${anexo.contenido}</pre>
+            <div style="margin-top: 10px;">
+              <button onclick="editarAnexo(${anexo.id})">✏️ Editar</button>
+              <button onclick="descargarAnexo(${anexo.id})">📥 Descargar</button>
+              <button onclick="simularEnvio(${anexo.id})">📤 Enviar</button>
+              <button onclick="eliminarAnexo(${anexo.id})" style="color:red;">🗑️ Eliminar</button>
+            </div>
+          `;
+
+          lista.appendChild(div);
+        });
+      }
+
+      function editarAnexo(id) {
+        const anexo = anexosGuardados.find(a => a.id === id);
+        if (!anexo) return;
+
+        idEditar = id;
+        document.getElementById('tituloForm').innerText = "Editar Anexo";
+        mostrarFormNuevoAnexo();
+        document.getElementById('nombreAnexo').value = anexo.nombre;
+        document.getElementById('contenidoAnexo').value = anexo.contenido;
+      }
+
+      function descargarAnexo(id) {
+        const anexo = anexosGuardados.find(a => a.id === id);
+        if (!anexo) return;
+
+        const blob = new Blob([anexo.contenido], { type: "text/plain;charset=utf-8" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = anexo.nombre;
+        link.click();
+      }
+
+      function simularEnvio(id) {
+        const anexo = anexosGuardados.find(a => a.id === id);
+        if (!anexo) return;
+
+        alert(`El anexo "${anexo.nombre}" ha sido enviado con éxito.\nContenido:\n${anexo.contenido}`);
+      }
+
+      function eliminarAnexo(id) {
+        if (!confirm("¿Está seguro que desea eliminar este anexo?")) return;
+
+        anexosGuardados = anexosGuardados.filter(a => a.id !== id);
+        renderizarAnexos();
+      }
+
+
+
+        function mostrarGastosPersonales() {
+        mostrar('anexos');
+
+        const contenido = `
+          <h3>Anexo de Gastos Personales</h3>
+          <p>Selecciona una opción:</p>
+          <button onclick="mostrarBeneficiario()">Beneficiario de pensión alimenticia</button>
+
+          <div id="contenidoBeneficiario" style="margin-top: 20px;"></div>
+        `;
+
+        document.getElementById('contenidoAnexos').innerHTML = contenido;
+      }
+
+      function mostrarBeneficiario() {
+        const contenedor = document.getElementById('contenidoBeneficiario');
+        contenedor.innerHTML = `
+          <h4>Verificación de Beneficiario</h4>
+          <label for="cedulaRuc">Ingrese RUC o Cédula:</label>
+          <input type="text" id="cedulaRuc" placeholder="Ej. 0102030405" maxlength="13"/>
+          <button onclick="verificarBeneficiario()">Verificar</button>
+          <div id="resultadoBeneficiario" style="margin-top: 10px;"></div>
+        `;
+      }
+
+      function verificarBeneficiario() {
+        const input = document.getElementById('cedulaRuc').value.trim();
+        const resultado = document.getElementById('resultadoBeneficiario');
+
+        if (!/^\d{10,13}$/.test(input)) {
+          resultado.innerHTML = `<p style="color: red;">❌ Ingrese un número válido de RUC o Cédula (10 o 13 dígitos).</p>`;
+          return;
+        }
+
+        const esBeneficiario = Math.random() < 0.5;
+
+        resultado.innerHTML = esBeneficiario
+          ? `<p style="color: green;">✅ El número ingresado SÍ es beneficiario de pensión alimenticia.</p>`
+          : `<p style="color: orange;">❌ El número ingresado NO es beneficiario de pensión alimenticia.</p>`;
+      }
+
+
+        //FACTURACIÓN
+
+        
+
+      // Facturación
+
+
+      function mostrarFacturacionFisica() {
+        const contenedor = document.getElementById("facturacionFisica").style.display = "block";
+        document.getElementById("facturacionElectronica").style.display = "none";
+
+        contenedor.style.display = "block";
+        contenedor.innerHTML = `
+          <h2>Facturación Física - Simulador SRI</h2>
+          <form id="formFacturaFisica">
+            <h4>Datos del Emisor</h4>
+            <input type="text" placeholder="Razón Social" id="emisor" required><br>
+            <input type="text" placeholder="RUC" id="rucEmisor" required><br>
+            <input type="text" placeholder="Dirección" id="direccionEmisor" required><br>
+
+            <h4>Datos del Cliente</h4>
+            <input type="text" placeholder="Nombre del Cliente" id="cliente" required><br>
+            <input type="text" placeholder="Cédula/RUC Cliente" id="rucCliente" required><br>
+
+            <h4>Detalles de la Factura</h4>
+            <input type="text" placeholder="Descripción del Producto o Servicio" id="detalle" required><br>
+            <input type="number" placeholder="Cantidad" id="cantidad" required><br>
+            <input type="number" placeholder="Precio Unitario" id="precio" required><br>
+
+            <button type="button" onclick="generarFacturaFisica()">📝 Generar Factura</button>
+          </form>
+        `;
+      }
+
+
+      // Generador simple de número de factura
+      function generarNumeroFactura() {
+        const aleatorio = Math.floor(Math.random() * 1000000).toString().padStart(6, "0");
+        return `001-001-${aleatorio}`;
+      }
+
+      // Simula generación de archivos .txt de autorización y factura
+      function generarFacturaFisica() {
+        const emisor = document.getElementById("emisor").value;
+        const rucEmisor = document.getElementById("rucEmisor").value;
+        const direccionEmisor = document.getElementById("direccionEmisor").value;
+
+        const cliente = document.getElementById("cliente").value;
+        const rucCliente = document.getElementById("rucCliente").value;
+
+        const detalle = document.getElementById("detalle").value;
+        const cantidad = parseInt(document.getElementById("cantidad").value);
+        const precio = parseFloat(document.getElementById("precio").value);
+
+        const subtotal = cantidad * precio;
+        const iva = subtotal * 0.12;
+        const total = subtotal + iva;
+        const fecha = new Date().toLocaleDateString();
+        const numeroFactura = generarNumeroFactura();
+        const numAutorizacion = Math.floor(Math.random() * 99999999999999999999).toString().padStart(19, "0");
+
+        // Contenido de la autorización
+        const contenidoAutorizacion = `
+      AUTORIZACIÓN SRI
+      -------------------------------
+      RUC: ${rucEmisor}
+      Número de autorización: ${numAutorizacion}
+      Factura No.: ${numeroFactura}
+      Fecha de autorización: ${fecha}
+      -------------------------------
+      Este archivo es válido como constancia de autorización
+      `;
+
+        // Contenido de la factura
+        const contenidoFactura = `
+      FACTURA FÍSICA SRI SIMULADA
+      ------------------------------------------------
+      Emisor: ${emisor}
+      RUC: ${rucEmisor}
+      Dirección: ${direccionEmisor}
+      Factura No.: ${numeroFactura}
+      Autorización SRI: ${numAutorizacion}
+      Fecha: ${fecha}
+
+      Cliente: ${cliente}
+      CI/RUC: ${rucCliente}
+
+      ------------------------------------------------
+      Detalle: ${detalle}
+      Cantidad: ${cantidad}
+      Precio Unitario: $${precio.toFixed(2)}
+      Subtotal: $${subtotal.toFixed(2)}
+      IVA 12%: $${iva.toFixed(2)}
+      Total: $${total.toFixed(2)}
+      ------------------------------------------------
+      "Este documento es válido para efectos tributarios"
+      `;
+
+        descargarTxt("autorizacion_sri.txt", contenidoAutorizacion);
+        descargarTxt("factura_fisica.txt", contenidoFactura);
+      }
+
+      // Función para generar descarga de archivo .txt
+      function descargarTxt(nombreArchivo, contenido) {
+        const blob = new Blob([contenido], { type: "text/plain" });
+        const enlace = document.createElement("a");
+        enlace.href = URL.createObjectURL(blob);
+        enlace.download = nombreArchivo;
+        enlace.click();
+      }
+
+
+      function mostrarFacturacionFisica() {
+        document.getElementById("facturacionFisica").style.display = "block";
+        document.getElementById("facturacionElectronica").style.display = "none";
+      }
+
+      function mostrarFacturacionElectronica() {
+        document.getElementById("facturacionFisica").style.display = "none";
+        document.getElementById("facturacionElectronica").style.display = "block";
+      }
+
+      function generarNumeroFactura() {
+        return `001-001-${Math.floor(Math.random() * 1000000).toString().padStart(6, "0")}`;
+      }
+
+      function descargarTxt(nombreArchivo, contenido) {
+        const blob = new Blob([contenido], { type: "text/plain" });
+        const enlace = document.createElement("a");
+        enlace.href = URL.createObjectURL(blob);
+        enlace.download = nombreArchivo;
+        enlace.click();
+      }
+
+      // Factura Física
+      function generarFacturaFisica() {
+        const emisor = document.getElementById("emisor").value;
+        const rucEmisor = document.getElementById("rucEmisor").value;
+        const direccionEmisor = document.getElementById("direccionEmisor").value;
+        const cliente = document.getElementById("cliente").value;
+        const rucCliente = document.getElementById("rucCliente").value;
+        const detalle = document.getElementById("detalle").value;
+        const cantidad = parseInt(document.getElementById("cantidad").value);
+        const precio = parseFloat(document.getElementById("precio").value);
+
+        const subtotal = cantidad * precio;
+        const iva = subtotal * 0.12;
+        const total = subtotal + iva;
+        const fecha = new Date().toLocaleDateString();
+        const numeroFactura = generarNumeroFactura();
+        const numAutorizacion = Math.floor(Math.random() * 99999999999999999999).toString().padStart(19, "0");
+
+        const autorizacion = `
+      AUTORIZACIÓN SRI
+      -------------------------------
+      RUC: ${rucEmisor}
+      Número de autorización: ${numAutorizacion}
+      Factura No.: ${numeroFactura}
+      Fecha de autorización: ${fecha}
+      -------------------------------
+      Este archivo es válido como constancia de autorización
+      `;
+
+        const factura = `
+      FACTURA FÍSICA SRI SIMULADA
+      -------------------------------
+      Emisor: ${emisor}
+      RUC: ${rucEmisor}
+      Dirección: ${direccionEmisor}
+      Factura No.: ${numeroFactura}
+      Autorización: ${numAutorizacion}
+      Fecha: ${fecha}
+
+      Cliente: ${cliente}
+      CI/RUC: ${rucCliente}
+
+      Detalle: ${detalle}
+      Cantidad: ${cantidad}
+      Precio Unitario: $${precio.toFixed(2)}
+      Subtotal: $${subtotal.toFixed(2)}
+      IVA 12%: $${iva.toFixed(2)}
+      Total: $${total.toFixed(2)}
+      -------------------------------
+      "Este documento es válido para efectos tributarios"
+      `;
+
+        descargarTxt("autorizacion_fisica.txt", autorizacion);
+        descargarTxt("factura_fisica.txt", factura);
+      }
+
+      // Factura Electrónica
+      function generarFacturaElectronica() {
+        const emisor = document.getElementById("emisorE").value;
+        const rucEmisor = document.getElementById("rucEmisorE").value;
+        const direccionEmisor = document.getElementById("direccionEmisorE").value;
+        const cliente = document.getElementById("clienteE").value;
+        const rucCliente = document.getElementById("rucClienteE").value;
+        const detalle = document.getElementById("detalleE").value;
+        const cantidad = parseInt(document.getElementById("cantidadE").value);
+        const precio = parseFloat(document.getElementById("precioE").value);
+
+        const subtotal = cantidad * precio;
+        const iva = subtotal * 0.12;
+        const total = subtotal + iva;
+
+        const fecha = new Date().toISOString().split('T')[0];
+        const numeroFactura = generarNumeroFactura();
+        const claveAcceso = Math.floor(10000000000000000000000000000000000000 + Math.random() * 90000000000000000000000000000000000000).toString();
+
+        const xml = `
+      <factura id="comprobante" version="1.1.0">
+        <infoTributaria>
+          <razonSocial>${emisor}</razonSocial>
+          <ruc>${rucEmisor}</ruc>
+          <claveAcceso>${claveAcceso}</claveAcceso>
+          <codDoc>01</codDoc>
+          <estab>001</estab>
+          <ptoEmi>001</ptoEmi>
+          <secuencial>${numeroFactura.split('-')[2]}</secuencial>
+          <dirMatriz>${direccionEmisor}</dirMatriz>
+        </infoTributaria>
+        <infoFactura>
+          <fechaEmision>${fecha}</fechaEmision>
+          <dirEstablecimiento>${direccionEmisor}</dirEstablecimiento>
+          <razonSocialComprador>${cliente}</razonSocialComprador>
+          <identificacionComprador>${rucCliente}</identificacionComprador>
+          <totalSinImpuestos>${subtotal.toFixed(2)}</totalSinImpuestos>
+          <totalConImpuestos>
+            <totalImpuesto>
+              <codigo>2</codigo>
+              <codigoPorcentaje>2</codigoPorcentaje>
+              <baseImponible>${subtotal.toFixed(2)}</baseImponible>
+              <valor>${iva.toFixed(2)}</valor>
+            </totalImpuesto>
+          </totalConImpuestos>
+          <importeTotal>${total.toFixed(2)}</importeTotal>
+        </infoFactura>
+        <detalles>
+          <detalle>
+            <descripcion>${detalle}</descripcion>
+            <cantidad>${cantidad}</cantidad>
+            <precioUnitario>${precio.toFixed(2)}</precioUnitario>
+            <precioTotalSinImpuesto>${subtotal.toFixed(2)}</precioTotalSinImpuesto>
+          </detalle>
+        </detalles>
+      </factura>
+      `;
+
+        const autorizacion = `
+      AUTORIZACIÓN SRI - FACTURACIÓN ELECTRÓNICA
+      --------------------------------------------
+      RUC del Emisor: ${rucEmisor}
+      Razón Social: ${emisor}
+      Número de Factura: ${numeroFactura}
+      Clave de Acceso: ${claveAcceso}
+      Fecha de Autorización: ${fecha}
+      Estado: AUTORIZADO
+      --------------------------------------------
+      Este documento sirve como constancia de autorización electrónica por el SRI
+      `;
+
+        descargarTxt("autorizacion_electronica.txt", autorizacion);
+        descargarTxt("factura_electronica.xml", xml);
+      }
+
+      const contenidoVehiculos = document.getElementById('contenidoVehiculos');
+        const reportes = [];
+
+        // Listas para generar datos aleatorios
+        const marcas = ['Toyota', 'Honda', 'Ford', 'Chevrolet', 'Nissan', 'Mazda', 'BMW', 'Kia', 'Hyundai', 'Volkswagen'];
+        const modelos = ['Corolla', 'Civic', 'Focus', 'Malibu', 'Sentra', '3', 'X5', 'Rio', 'Elantra', 'Golf'];
+        const motivos = ['Multa pendiente', 'Impuesto atrasado', 'Revisión técnica vencida', 'Seguro obligatorio vencido', 'Deuda por parqueo', 'Restricción legal'];
+
+        function aleatorioInt(min, max) {
+          return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generarDatosAleatorios(valorBusqueda) {
+          const marca = marcas[aleatorioInt(0, marcas.length - 1)];
+          const modelo = modelos[aleatorioInt(0, modelos.length - 1)];
+          const anio = aleatorioInt(2000, new Date().getFullYear());
+          const motivoReporte = motivos[aleatorioInt(0, motivos.length -1)];
+          const valorReporte = (aleatorioInt(50, 500) + Math.random()).toFixed(2);
+
+          return {
+            placa: valorBusqueda.toUpperCase(),
+            marca: marca,
+            modelo: modelo,
+            anio: anio,
+            motivoReporte: motivoReporte,
+            valorReporte: parseFloat(valorReporte)
+          };
+        }
+
+
+        // Mostrar formulario para consulta
+        function mostrarConsultaVehiculo() {
+          contenidoVehiculos.innerHTML = `
+            <div style="margin-top:15px; background:#f5f8fc; padding:15px; border-radius:8px; max-width: 400px;">
+              <h3>Consulta de valores</h3>
+              <label for="tipoBusqueda">Selecciona tipo de búsqueda:</label>
+              <select id="tipoBusqueda" style="width:100%; padding:6px; margin-bottom:8px;">
+                <option value="placa">Placa</option>
+                <option value="ramv">RAMV</option>
+                <option value="cpn">CPN</option>
+                <option value="chasis">Chasis</option>
+              </select>
+              <input type="text" id="inputBusqueda" placeholder="Ej. AAA0123 o 13VW1234567890" style="width:100%; padding:6px; margin-bottom:8px;" />
+              <button id="btnValidar" style="background:#0c3a70; color:white; padding:8px 12px; border:none; border-radius:4px; cursor:pointer;">Validar</button>
+              <div id="resultadoConsulta" style="margin-top:15px;"></div>
+            </div>
+          `;
+
+          document.getElementById('btnValidar').addEventListener('click', () => {
+            const tipoBusqueda = document.getElementById('tipoBusqueda').value;
+            const valorBusqueda = document.getElementById('inputBusqueda').value.trim();
+
+            if (!valorBusqueda) {
+              alert('Por favor ingresa un valor para buscar.');
+              return;
+            }
+
+            const datos = generarDatosAleatorios(valorBusqueda);
+
+            const valorConDescuento = (datos.valorReporte * 0.88).toFixed(2);
+
+            const resultadoDiv = document.getElementById('resultadoConsulta');
+            resultadoDiv.innerHTML = `
+              <p><strong>Placa:</strong> ${datos.placa}</p>
+              <p><strong>Marca:</strong> ${datos.marca}</p>
+              <p><strong>Modelo:</strong> ${datos.modelo}</p>
+              <p><strong>Año:</strong> ${datos.anio}</p>
+              <p><strong>Motivo de reporte:</strong> ${datos.motivoReporte}</p>
+              <p><strong>Valor del reporte:</strong> $${datos.valorReporte.toFixed(2)}</p>
+              <p><strong>Valor a pagar con 12% descuento:</strong> $${valorConDescuento}</p>
+              <button id="btnGuardarReporte" style="background:#007b00; color:white; padding:8px 12px; border:none; border-radius:4px; cursor:pointer;">Guardar reporte</button>
+            `;
+
+
+            document.getElementById('btnGuardarReporte').addEventListener('click', () => {
+              const nuevoReporte = {
+                id: Date.now(),
+                placa: datos.placa,
+                marca: datos.marca,
+                modelo: datos.modelo,
+                anio: datos.anio,
+                motivoReporte: datos.motivoReporte,
+                valorReporte: datos.valorReporte,
+                valorAPagar: valorConDescuento
+              };
+
+              reportes.push(nuevoReporte);
+              alert('Reporte guardado correctamente.');
+              contenidoVehiculos.innerHTML = '';
+            });
+          });
+        }
+
+        // Mostrar reportes guardados
+        function mostrarReportePagoVehiculo() {
+          if(reportes.length === 0){
+            contenidoVehiculos.innerHTML = `<p style="margin-top:15px;">No hay reportes guardados.</p>`;
+            return;
+          }
+
+          let html = `<div style="margin-top:15px;">`;
+          reportes.forEach(rep => {
+            html += `
+              <div style="background:#e9f1fa; padding:12px; margin-bottom:12px; border-radius:6px; max-width: 400px;">
+                <p><strong>Placa:</strong> ${rep.placa}</p>
+                <p><strong>Marca:</strong> ${rep.marca}</p>
+                <p><strong>Modelo:</strong> ${rep.modelo}</p>
+                <p><strong>Año:</strong> ${rep.anio}</p>
+                <p><strong>Motivo:</strong> ${rep.motivoReporte}</p>
+                <p><strong>Valor a pagar:</strong> $${rep.valorAPagar}</p>
+                <button onclick="abrirModalPago(${rep.id})" style="margin-right:8px; background:#0c3a70; color:white; border:none; border-radius:4px; padding:6px 10px; cursor:pointer;">Pago por tarjeta de crédito</button>
+                <button onclick="generarBoletoPago(${rep.id})" style="background:#0a6f0a; color:white; border:none; border-radius:4px; padding:6px 10px; cursor:pointer;">Generar boleto de pago</button>
+              </div>
+            `;
+          });
+          html += `</div>`;
+
+          contenidoVehiculos.innerHTML = html;
+        }
+
+        // Modal pago tarjeta
+        let reporteSeleccionado = null;
+        function abrirModalPago(id) {
+          reporteSeleccionado = reportes.find(r => r.id === id);
+          if (!reporteSeleccionado) {
+            alert('Reporte no encontrado');
+            return;
+          }
+
+          // Crear modal si no existe
+          if (!document.getElementById('modalPagoTarjeta')) {
+            const modalHtml = `
+              <div id="modalPagoTarjeta" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);
+                display:flex; justify-content:center; align-items:center; z-index:1000;">
+                <div style="background:#fff; padding:20px; border-radius:8px; width:320px; position:relative;">
+                  <h3>Pago con tarjeta de crédito</h3>
+                  <label>Número de tarjeta (16 dígitos)</label>
+                  <input type="text" id="tarjetaNumero" maxlength="16" placeholder="1234 5678 9012 3456" style="width:100%; padding:6px; margin-bottom:8px;" />
+                  <label>Código de seguridad (CVV)</label>
+                  <input type="text" id="tarjetaCVV" maxlength="3" placeholder="123" style="width:100%; padding:6px; margin-bottom:8px;" />
+                  <label>Fecha de vencimiento (MM/AA)</label>
+                  <input type="text" id="tarjetaVence" maxlength="5" placeholder="12/24" style="width:100%; padding:6px; margin-bottom:8px;" />
+                  <button id="btnPagarTarjeta" style="background:#0c3a70; color:white; border:none; border-radius:4px; padding:8px 12px; cursor:pointer;">Pagar</button>
+                  <button id="btnCerrarModal" style="margin-top:10px; background:#aaa; color:#333; border:none; border-radius:4px; padding:8px 12px; width:100%; cursor:pointer;">Cerrar</button>
+                </div>
+              </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            document.getElementById('btnCerrarModal').addEventListener('click', cerrarModalPago);
+            document.getElementById('btnPagarTarjeta').addEventListener('click', realizarPago);
+          }
+
+          document.getElementById('modalPagoTarjeta').style.display = 'flex';
+          // Limpiar inputs
+          document.getElementById('tarjetaNumero').value = '';
+          document.getElementById('tarjetaCVV').value = '';
+          document.getElementById('tarjetaVence').value = '';
+        }
+
+        function cerrarModalPago() {
+          document.getElementById('modalPagoTarjeta').style.display = 'none';
+        }
+
+        function realizarPago() {
+        const num = document.getElementById('tarjetaNumero').value.trim();
+        const cvv = document.getElementById('tarjetaCVV').value.trim();
+        const vence = document.getElementById('tarjetaVence').value.trim();
+
+        // Validaciones
+        if (!/^\d{16}$/.test(num)) {
+          alert('Número de tarjeta inválido. Debe tener 16 dígitos.');
+          return;
+        }
+
+        if (!/^\d{3}$/.test(cvv)) {
+          alert('Código CVV inválido. Debe tener exactamente 3 dígitos.');
+          return;
+        }
+
+        if (!/^\d{2}\/\d{2}$/.test(vence)) {
+          alert('Fecha de vencimiento inválida. Use formato MM/AA.');
+          return;
+        }
+
+        const [mesStr, anioStr] = vence.split('/');
+        const mes = parseInt(mesStr, 10);
+        const anio = parseInt('20' + anioStr, 10);
+
+        if (mes < 1 || mes > 12) {
+          alert('Mes inválido. Debe estar entre 01 y 12.');
+          return;
+        }
+
+        if (anio > 2026) {
+          alert('Año inválido. Solo se permiten tarjetas hasta 2026.');
+          return;
+        }
+
+        // Pago exitoso
+        alert(`✅ Pago realizado exitosamente para la placa ${reporteSeleccionado.placa}.`);
+
+        // Eliminar el reporte del arreglo
+        reportes.splice(reportes.findIndex(r => r.id === reporteSeleccionado.id), 1);
+
+        // Cerrar y actualizar vista
+        cerrarModalPago();
+        mostrarReportePagoVehiculo();
+      }
+
+
+        function generarBoletoPago(id) {
+        const reporte = reportes.find(r => r.id === id);
+        if (!reporte) {
+          alert('Reporte no encontrado.');
+          return;
+        }
+
+        const contenido = `
+          ====== BOLETO DE PAGO ======
+          Placa: ${reporte.placa}
+          Marca: ${reporte.marca}
+          Modelo: ${reporte.modelo}
+          Año: ${reporte.anio}
+          Motivo: ${reporte.motivoReporte}
+          Valor a pagar: $${reporte.valorAPagar}
+
+          Cuenta Institucional Gobierno:
+          Banco: Banco del Estado
+          Número de cuenta: 1234567890
+          Tipo de cuenta: Corriente
+
+          Para realizar el pago, use su banca electrónica o acuda al banco con esta información.
+          Fecha de emisión: ${new Date().toLocaleDateString()}
+        `;
+
+        // Crear archivo txt para descarga
+        const blob = new Blob([contenido], { type: 'text/plain' });
+        const enlace = document.createElement('a');
+        enlace.href = URL.createObjectURL(blob);
+        enlace.download = `boleto_pago_${reporte.placa}.txt`;
+        document.body.appendChild(enlace);
+        enlace.click();
+        document.body.removeChild(enlace);
+
+        // Eliminar reporte del array
+        reportes.splice(reportes.findIndex(r => r.id === id), 1);
+
+        // Actualizar la vista
+        mostrarReportePagoVehiculo();
+      }
+
+
+
+        // Simulación de datos base (podrías conectar con tus arrays reales más adelante)
+        // 🟦 Valores iniciales
+        let datosSistema = {
+          facturas: Math.floor(Math.random() * 3001) + 2000,
+          anexos: Math.floor(Math.random() * 3001) + 2000,
+          deudas: Math.floor(Math.random() * 3001) + 2000,
+          reportesVehiculos: Math.floor(Math.random() * 3001) + 2000
+        };
+
+        function generarVariacionPorcentaje(valor) {
+          const variacion = Math.floor(valor * 0.15);
+          const cambio = Math.floor(Math.random() * (variacion + 1));
+          const suma = Math.random() < 0.5 ? -cambio : cambio;
+          return Math.max(0, valor + suma);
+        }
+
+        function obtenerDatosVariables() {
+          return {
+            facturas: generarVariacionPorcentaje(datosSistema.facturas),
+            anexos: generarVariacionPorcentaje(datosSistema.anexos),
+            deudas: generarVariacionPorcentaje(datosSistema.deudas),
+            reportesVehiculos: generarVariacionPorcentaje(datosSistema.reportesVehiculos)
+          };
+        }
+
+        let graficaSistema = null;
+        let intervaloGrafica = null;
+
+        function mostrarGrafica() {
+          document.querySelectorAll('.modulo').forEach(m => m.classList.add('hidden'));
+          document.getElementById('grafica').classList.remove('hidden');
+
+          const ctx = document.getElementById('graficaSistema').getContext('2d');
+          const datosIniciales = obtenerDatosVariables();
+
+          graficaSistema = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: [
+                'Facturas Generadas',
+                'Anexos Procesados',
+                'Deudas Registradas',
+                'Reportes de Vehículos'
+              ],
+              datasets: [{
+                label: 'Cantidad total',
+                data: [
+                  datosIniciales.facturas,
+                  datosIniciales.anexos,
+                  datosIniciales.deudas,
+                  datosIniciales.reportesVehiculos
+                ],
+                backgroundColor: ['#007bff88', '#28a74588', '#ffc10788', '#dc354588'],
+                borderColor: ['#007bff', '#28a745', '#ffc107', '#dc3545'],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
+              },
+              plugins: {
+                title: {
+                  display: true,
+                  text: 'Resumen General del Sistema'
+                },
+                legend: {
+                  display: false
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    precision: 0
+                  }
+                }
+              }
+            }
+          });
+
+          // Evita múltiples intervalos
+          if (intervaloGrafica) clearInterval(intervaloGrafica);
+
+          intervaloGrafica = setInterval(() => {
+            const nuevosDatos = obtenerDatosVariables();
+            const nuevosValores = [
+              nuevosDatos.facturas,
+              nuevosDatos.anexos,
+              nuevosDatos.deudas,
+              nuevosDatos.reportesVehiculos
+            ];
+
+            // 🔄 Actualiza solo los datos sin destruir la gráfica
+            graficaSistema.data.datasets[0].data = nuevosValores;
+            graficaSistema.update();
+          }, 6000);
+        }
+
+
+      let deudasUsuario = [];
+
+        function mostrarConsultaDeudas() {
+          // Limpiar contenido y deshabilitar botones pagar/facilidades
+          document.getElementById("contenidoDeudas").innerHTML = `
+            <h3>Consulta de Deudas</h3>
+            <label>Cédula/RUC:</label>
+            <input type="text" id="cedulaConsulta" placeholder="Ej: 0102030405">
+            <button onclick="validarConsultaDeudas()">Consultar</button>
+            <div id="resultadoConsulta" style="margin-top: 10px;"></div>
+          `;
+          document.getElementById("btnPagarDeudas").disabled = true;
+          document.getElementById("btnFacilidadesPago").disabled = true;
+        }
+
+        function validarConsultaDeudas() {
+          const cedula = document.getElementById("cedulaConsulta").value.trim();
+          const resultadoDiv = document.getElementById("resultadoConsulta");
+
+          if (cedula.length < 10) {
+            alert("Por favor ingresa un número válido de cédula o RUC.");
+            return;
+          }
+
+          // Simulación de consulta: Generamos aleatoriamente si hay o no deuda
+          const tieneDeuda = Math.random() < 0.6; // 60% probabilidad de deuda
+
+          if (!tieneDeuda) {
+            deudasUsuario = []; // Vaciar listado
+            resultadoDiv.innerHTML = `<p style="color:green;">No tiene deudas registradas para el RUC/Cédula ${cedula}.</p>`;
+            document.getElementById("btnPagarDeudas").disabled = true;
+            document.getElementById("btnFacilidadesPago").disabled = true;
+            return;
+          }
+
+          // Si tiene deudas, simulamos un listado (puedes ajustar estos datos)
+          deudasUsuario = [
+            { id: "D001", descripcion: "Impuesto Renta 2024", monto: 350.00 },
+            { id: "D002", descripcion: "Multa por declaración tardía", monto: 50.00 },
+          ];
+
+          let htmlReporte = `<p style="color:red;">Se encontraron ${deudasUsuario.length} deudas para el RUC/Cédula ${cedula}:</p><ul>`;
+          deudasUsuario.forEach(deuda => {
+            htmlReporte += `<li><strong>${deuda.descripcion}</strong> - $${deuda.monto.toFixed(2)} (ID: ${deuda.id})</li>`;
+          });
+          htmlReporte += "</ul>";
+
+          resultadoDiv.innerHTML = htmlReporte;
+
+          // Habilitar botones de pago y facilidades
+          document.getElementById("btnPagarDeudas").disabled = false;
+          document.getElementById("btnFacilidadesPago").disabled = false;
+        }
+
+        function mostrarPagoDeudas() {
+          if(deudasUsuario.length === 0){
+            alert("No hay deudas registradas para pagar.");
+            return;
+          }
+
+          let contenido = `
+            <h3>Pagar Deudas</h3>
+            <label>Selecciona la deuda a pagar:</label>
+            <select id="selectDeudaPago">
+              ${deudasUsuario.map(d => `<option value="${d.id}">${d.descripcion} - $${d.monto.toFixed(2)}</option>`).join('')}
+            </select>
+            <label>Monto a pagar:</label>
+            <input type="number" id="montoPago" min="0.01" step="0.01" placeholder="Ej: 100.00" value="${deudasUsuario[0].monto.toFixed(2)}">
+            <button onclick="validarPagoDeudas()">Pagar</button>
+            <div id="mensajePago" style="margin-top:10px;"></div>
+          `;
+
+          document.getElementById("contenidoDeudas").innerHTML = contenido;
+
+          // Al cambiar deuda seleccionada, actualizar monto automáticamente
+          document.getElementById("selectDeudaPago").addEventListener('change', function(){
+            const selectedId = this.value;
+            const deuda = deudasUsuario.find(d => d.id === selectedId);
+            if(deuda){
+              document.getElementById("montoPago").value = deuda.monto.toFixed(2);
+            }
+          });
+        }
+
+        function validarPagoDeudas() {
+          const id = document.getElementById("selectDeudaPago").value;
+          const montoInput = document.getElementById("montoPago").value;
+          const monto = parseFloat(montoInput);
+          const mensajeDiv = document.getElementById("mensajePago");
+
+          if (!id || isNaN(monto) || monto <= 0) {
+            alert("Completa correctamente los campos para procesar el pago.");
+            return;
+          }
+
+          const deuda = deudasUsuario.find(d => d.id === id);
+          if (!deuda) {
+            alert("Deuda no encontrada.");
+            return;
+          }
+
+          if (monto > deuda.monto) {
+            alert(`El monto a pagar no puede ser mayor al total de la deuda ($${deuda.monto.toFixed(2)}).`);
+            return;
+          }
+
+          // Simular pago parcial o total
+          deuda.monto -= monto;
+
+          let msg = `Pago realizado por $${monto.toFixed(2)} para la deuda "${deuda.descripcion}". `;
+
+          if (deuda.monto <= 0.01) {
+            // Eliminar deuda si saldo es 0 o menor
+            deudasUsuario = deudasUsuario.filter(d => d.id !== id);
+            msg += "Deuda saldada completamente.";
+          } else {
+            msg += `Saldo restante: $${deuda.monto.toFixed(2)}.`;
+          }
+
+          mensajeDiv.innerHTML = `<p style="color:green;">${msg}</p>`;
+
+          // Actualizar select y monto
+          if(deudasUsuario.length === 0){
+            document.getElementById("contenidoDeudas").innerHTML = `<p>No quedan deudas pendientes.</p>`;
+            document.getElementById("btnPagarDeudas").disabled = true;
+            document.getElementById("btnFacilidadesPago").disabled = true;
+          } else {
+            mostrarPagoDeudas();
+          }
+        }
+
+        function mostrarFacilidadesPago() {
+          if(deudasUsuario.length === 0){
+            alert("No hay deudas registradas para solicitar facilidades.");
+            return;
+          }
+
+          let contenido = `
+            <h3>Solicitar Facilidades de Pago</h3>
+            <label>Cédula/RUC:</label>
+            <input type="text" id="cedulaFacilidad" placeholder="Ej: 0102030405">
+            <label>Cuotas:</label>
+            <input type="number" id="cuotas" min="1" placeholder="Ej: 6">
+            <button onclick="validarFacilidadesPago()">Solicitar</button>
+            <div id="mensajeFacilidad" style="margin-top:10px;"></div>
+          `;
+
+          document.getElementById("contenidoDeudas").innerHTML = contenido;
+        }
+
+        function validarFacilidadesPago() {
+          const cedula = document.getElementById("cedulaFacilidad").value.trim();
+          const cuotas = parseInt(document.getElementById("cuotas").value);
+          const mensajeDiv = document.getElementById("mensajeFacilidad");
+
+          if (cedula.length < 10) {
+            alert("Por favor ingresa un número válido de cédula o RUC.");
+            return;
+          }
+          if (isNaN(cuotas) || cuotas < 1) {
+            alert("Ingresa un número válido de cuotas.");
+            return;
+          }
+          if (deudasUsuario.length === 0) {
+            alert("No hay deudas para solicitar facilidades de pago.");
+            return;
+          }
+
+          mensajeDiv.innerHTML = `<p style="color:green;">Solicitud enviada para ${cuotas} cuotas al RUC/Cédula ${cedula}. (Simulación)</p>`;
+        }
+
+    </script>
+
+    <footer  style="text-align:justify; background: #004b8d; color: white; position: fixed; bottom: 0; width: 100%; height: auto; margin: auto;">
+      © 2025 Sistema Web SRI
+    </footer>
+  </body>
 </html>
-
-
