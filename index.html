@@ -216,6 +216,157 @@
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
       }
 
+      /* --- Formulario RUC --- */
+    #formularioRUC {
+        max-width: 500px;
+        margin: 30px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    #formularioRUC h3 {
+        text-align: center;
+        color: #004b8d;
+        margin-bottom: 20px;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    #formularioRUC form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    #formularioRUC input,
+    #formularioRUC select {
+        padding: 12px 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+
+    #formularioRUC input:focus,
+    #formularioRUC select:focus {
+        border-color: #3498db;
+        outline: none;
+    }
+
+    #formularioRUC button {
+        padding: 12px;
+        background-color: #004b8d;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    #formularioRUC button:hover {
+        background-color: #0069d9;
+    }
+
+    /* --- Facturación: centrado y estilos --- */
+    #facturacion {
+        display: flex; /* Cambiado a flex */
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    #facturacion .subopciones {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        margin-top: 20px;
+        width: 100%;
+    }
+
+    #facturacion .subopciones button {
+        width: 280px;
+        background-color: #004b8d;
+        color: #fff;
+        padding: 12px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        text-align: center;
+        transition: background-color 0.3s ease;
+    }
+
+    #facturacion .subopciones button:hover {
+        background-color: #0069d9;
+    }
+
+    #facturacion h2 {
+        color: #004b8d;
+        margin-bottom: 10px;
+    }
+
+    /* --- Formularios de facturación --- */
+    #facturacionFisica,
+    #facturacionElectronica {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 25px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    #facturacionElectronica {
+        background-color: #eef6ff;
+    }
+
+    #facturacionFisica h2,
+    #facturacionElectronica h2,
+    #facturacionFisica form,
+    #facturacionElectronica form {
+        text-align: center;
+    }
+
+    #facturacionFisica form,
+    #facturacionElectronica form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    #facturacionFisica input,
+    #facturacionElectronica input {
+        width: 100%;
+        max-width: 480px;
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    #facturacionFisica button,
+    #facturacionElectronica button {
+        background-color: #28a745;
+        border: none;
+        padding: 12px;
+        border-radius: 6px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #facturacionFisica button:hover,
+    #facturacionElectronica button:hover {
+        background-color: #218838;
+    }
+
       
     </style>
 
