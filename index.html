@@ -1577,15 +1577,15 @@ function validarDato(tipo) {
   const mensaje = document.getElementById('mensaje');
   mensaje.className = '';
 
-  const regexPlaca = /^[A-Z]{3}[0-9]{3,4}$/;
-  const regexChasis = /^[A-Z0-9]{17}$/;
+  const regexPlaca = /^[A-Z]{3}[0-9]{3,4}$/; // 3 letras mayúsculas seguidas de 3-4 números
+  const regexChasis = /^[A-Z0-9]{17}$/; // 17 caracteres que pueden ser letras mayúsculas o números
 
   if ((tipo === 'placa' && !regexPlaca.test(input)) || (tipo === 'chasis' && !regexChasis.test(input))) {
     mensaje.textContent = tipo === 'placa'
-      ? 'Dato inválido. Formato: 3 letras MAYÚSCULAS y 3-4 números (Ej: ABC1234).'
+      ? 'Placa inválida. Formato: 3 letras MAYÚSCULAS y 3-4 números (Ej: ABC1234).'
       : 'Código inválido. Debe tener 17 caracteres MAYÚSCULOS y números.';
     mensaje.style.color = 'red';
-    return;
+    return; // Termina la función si la placa es inválida
   }
 
   mensaje.textContent = tipo === 'placa' ? 'Placa válida.' : 'Código de chasis válido.';
@@ -1599,6 +1599,7 @@ function validarDato(tipo) {
     renderizarDatos(data, tipo, input);
   }
 }
+
 
 function generarDatosAleatorios(tipo, input) {
   const marcas = Object.keys(marcasModelos);
