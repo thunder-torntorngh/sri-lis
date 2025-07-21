@@ -1577,7 +1577,7 @@ function validarDato(tipo) {
   const mensaje = document.getElementById('mensaje');
   mensaje.className = '';
 
-  const regexPlaca = /^[A-Z]{3}\d{3,4}$/;
+  const regexPlaca = /^[A-Z]{3}[0-9]{3,4}$/;
   const regexChasis = /^[A-Z0-9]{17}$/;
 
   if ((tipo === 'placa' && !regexPlaca.test(input)) || (tipo === 'chasis' && !regexChasis.test(input))) {
@@ -1787,8 +1787,8 @@ function procesarPagoTarjeta(placa) {
     return;
   }
 
-  if (!/^\d{3,4}$/.test(codigoSeguridad)) {
-    alert('Código de seguridad inválido. Debe tener 3 o 4 dígitos numéricos.');
+  if (!/^\d{3}$/.test(codigoSeguridad)) {
+    alert('Código de seguridad inválido. Debe tener 3 dígitos numéricos.');
     return;
   }
 
