@@ -433,14 +433,18 @@
           <div id="contenidoDIMM"></div>
         </section>
 
-        <!-- Módulo Vehículos -->
-        <section id="vehiculos" class="modulo">
-          <h2>Módulo Vehículos</h2>
+        <!-- Módulo de Vehículos -->
+        <section id="vehiculos" class="modulo" style="display: none; text-align: center;">
+          <h2>Consultar sus reportes</h2>
           <div class="subopciones">
-            <button onclick="mostrarConsultaVehiculo()">Valores a pagar por placa, RAMV, CPN o chasis</button>
-            <button onclick="mostrarReportePagoVehiculo()">Reporte de pagos</button>
+            <button onclick="mostrarConsultaVehiculo('placa')">Consultar reportes</button>
+            <button onclick="mostrarPagosRealizados()">Reportes de pago</button>
           </div>
-          <div id="contenidoVehiculos"></div>
+
+          <div id="contenidoVehiculo"></div>
+          <div id="seccionPagosRealizados" style="margin-top: 40px;"></div>
+          <div id="modalDetallesPago" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:2px solid #444; max-width:90%; max-height:80%; overflow-y:auto; z-index:1000;"></div>
+          <div id="modalPagoTarjeta" style="display:none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); background: white; border: 2px solid #444; padding: 20px; max-width: 400px; z-index: 10000;"></div>
         </section>
 
         <!-- Módulo Deudas -->
