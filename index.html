@@ -1323,257 +1323,452 @@
         descargarTxt("factura_electronica.xml", xml);
       }
 
-      const contenidoVehiculos = document.getElementById('contenidoVehiculos');
-        const reportes = [];
-
-        // Listas para generar datos aleatorios
-        const marcas = ['Toyota', 'Honda', 'Ford', 'Chevrolet', 'Nissan', 'Mazda', 'BMW', 'Kia', 'Hyundai', 'Volkswagen'];
-        const modelos = ['Corolla', 'Civic', 'Focus', 'Malibu', 'Sentra', '3', 'X5', 'Rio', 'Elantra', 'Golf'];
-        const motivos = ['Multa pendiente', 'Impuesto atrasado', 'Revisión técnica vencida', 'Seguro obligatorio vencido', 'Deuda por parqueo', 'Restricción legal'];
-
-        function aleatorioInt(min, max) {
-          return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        function generarDatosAleatorios(valorBusqueda) {
-          const marca = marcas[aleatorioInt(0, marcas.length - 1)];
-          const modelo = modelos[aleatorioInt(0, modelos.length - 1)];
-          const anio = aleatorioInt(2000, new Date().getFullYear());
-          const motivoReporte = motivos[aleatorioInt(0, motivos.length -1)];
-          const valorReporte = (aleatorioInt(50, 500) + Math.random()).toFixed(2);
-
-          return {
-            placa: valorBusqueda.toUpperCase(),
-            marca: marca,
-            modelo: modelo,
-            anio: anio,
-            motivoReporte: motivoReporte,
-            valorReporte: parseFloat(valorReporte)
-          };
-        }
+      //=======================================  VEHICULO  ===============================================
 
 
-        // Mostrar formulario para consulta
-        function mostrarConsultaVehiculo() {
-          contenidoVehiculos.innerHTML = `
-            <div style="margin-top:15px; background:#f5f8fc; padding:15px; border-radius:8px; max-width: 400px;">
-              <h3>Consulta de valores</h3>
-              <label for="tipoBusqueda">Selecciona tipo de búsqueda:</label>
-              <select id="tipoBusqueda" style="width:100%; padding:6px; margin-bottom:8px;">
-                <option value="placa">Placa</option>
-                <option value="ramv">RAMV</option>
-                <option value="cpn">CPN</option>
-                <option value="chasis">Chasis</option>
-              </select>
-              <input type="text" id="inputBusqueda" placeholder="Ej. AAA0123 o 13VW1234567890" style="width:100%; padding:6px; margin-bottom:8px;" />
-              <button id="btnValidar" style="background:#0c3a70; color:white; padding:8px 12px; border:none; border-radius:4px; cursor:pointer;">Validar</button>
-              <div id="resultadoConsulta" style="margin-top:15px;"></div>
-            </div>
-          `;
+const marcasModelos = {
+  "Chevrolet": ["Aveo", "Spark GT", "Tracker", "Onix"],
+  "Toyota": ["Corolla", "Yaris", "RAV4", "Hilux"],
+  "Ford": ["Fiesta", "Focus", "Escape", "Explorer"],
+  "Kia": ["Rio", "Sportage", "Cerato", "Seltos"]
+};
 
-          document.getElementById('btnValidar').addEventListener('click', () => {
-            const tipoBusqueda = document.getElementById('tipoBusqueda').value;
-            const valorBusqueda = document.getElementById('inputBusqueda').value.trim();
+const datosGuardados = {};
+const pagosRealizados = {};
+const pagosConfirmados = new Set(); // Control para evitar pagos duplicados
 
-            if (!valorBusqueda) {
-              alert('Por favor ingresa un valor para buscar.');
-              return;
-            }
+// Listas de nombres para generación aleatoria
+const nombresHombres = ["Juan", "Carlos", "Luis", "Miguel", "José", "Andrés"];
+const apellidosHombres = ["Pérez", "García", "Rodríguez", "López", "Martínez"];
+const nombresMujeres = ["María", "Luisa", "Ana", "Carla", "Sofía", "Elena"];
+const apellidosMujeres = ["Gómez", "Díaz", "Fernández", "Morales", "Castro"];
 
-            const datos = generarDatosAleatorios(valorBusqueda);
+// Variable global para guardar el último dato válido ingresado
+let ultimoDatoIngresado = '';
 
-            const valorConDescuento = (datos.valorReporte * 0.88).toFixed(2);
+function mostrarConsultaVehiculo(tipo) {
+  const contenido = document.getElementById('contenidoVehiculo');
+  const seccionPagos = document.getElementById('seccionPagosRealizados');
+  seccionPagos.innerHTML = ''; // Limpiar pagos al mostrar consulta
 
-            const resultadoDiv = document.getElementById('resultadoConsulta');
-            resultadoDiv.innerHTML = `
-              <p><strong>Placa:</strong> ${datos.placa}</p>
-              <p><strong>Marca:</strong> ${datos.marca}</p>
-              <p><strong>Modelo:</strong> ${datos.modelo}</p>
-              <p><strong>Año:</strong> ${datos.anio}</p>
-              <p><strong>Motivo de reporte:</strong> ${datos.motivoReporte}</p>
-              <p><strong>Valor del reporte:</strong> $${datos.valorReporte.toFixed(2)}</p>
-              <p><strong>Valor a pagar con 12% descuento:</strong> $${valorConDescuento}</p>
-              <button id="btnGuardarReporte" style="background:#007b00; color:white; padding:8px 12px; border:none; border-radius:4px; cursor:pointer;">Guardar reporte</button>
-            `;
+  let placeholder = tipo === 'placa'
+    ? 'Ingrese Placa, RAMV o CPN (Ej: ABC1234)'
+    : 'Ingrese Código de Chasis (17 caracteres MAYÚSCULOS)';
+
+  contenido.innerHTML = `
+    <input type="text" id="inputDato" placeholder="${placeholder}" />
+    <button onclick="validarDato('${tipo}')">Validar</button>
+    <p id="mensaje" style="margin-top: 5px;"></p>
+    <div id="infoVehiculo" style="margin-top: 20px;"></div>
+    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+      <div id="infoPagoIzq" style="border: 1px solid #ccc; padding: 10px; border-radius: 6px; display: inline-block;"></div>
+      <div id="metodosPagoDer" style="border: 1px solid #ccc; padding: 10px; border-radius: 6px; display: inline-block;"></div>
+    </div>
+    <div id="tablaReportes" style="margin-top: 30px; display: flex; justify-content: center;"></div>
+  `;
+}
+
+function mostrarPagosRealizados() {
+  const seccionPagos = document.getElementById('seccionPagosRealizados');
+  const contenido = document.getElementById('contenidoVehiculo');
+
+  contenido.innerHTML = '';  // Ocultamos consulta
+  cerrarModal();
+  cerrarModalPagoTarjeta();
+
+  if (!ultimoDatoIngresado || !pagosRealizados[ultimoDatoIngresado] || pagosRealizados[ultimoDatoIngresado].length === 0) {
+    seccionPagos.innerHTML = '<p style="color: gray;">No existen pagos registrados para este dato.</p>';
+    return;
+  }
+
+  const pagos = pagosRealizados[ultimoDatoIngresado];
+  seccionPagos.innerHTML = ''; // Limpiar antes de agregar
+  pagos.forEach((pago, index) => {
+    let filas = '';
+    pago.datos.forEach(r => {
+      filas += `
+        <tr>
+          <td>${r.rubro}</td>
+          <td>${r.fecha}</td>
+          <td>$${r.valor}</td>
+        </tr>
+      `;
+    });
+
+    seccionPagos.innerHTML += `
+      <div style="margin-top: 20px; border: 1px solid #aaa; padding: 10px; border-radius: 6px; max-width: 850px;">
+        <h3>Pago realizado en ${pago.anio}</h3>
+        <table border="1" cellpadding="5" cellspacing="0" style="width: 100%; margin-bottom: 10px; text-align:center;">
+          <thead>
+            <tr>
+              <th>Rubro</th>
+              <th>Fecha</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filas}
+            <tr>
+              <td colspan="2"><strong>Total</strong></td>
+              <td><strong>$${pago.total}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        <button style="float:right;" onclick="verDetalles(${index}, '${ultimoDatoIngresado}')">🔍 Ver detalles</button>
+      </div>
+    `;
+  });
+}
+
+function validarDato(tipo) {
+  const input = document.getElementById('inputDato').value.trim().toUpperCase();
+  ultimoDatoIngresado = input; // Guardar el dato ingresado para uso posterior
+
+  const mensaje = document.getElementById('mensaje');
+  mensaje.className = '';
+
+  const regexPlaca = /^[A-Z]{3}\d{3,4}$/;
+  const regexChasis = /^[A-Z0-9]{17}$/;
+
+  if ((tipo === 'placa' && !regexPlaca.test(input)) || (tipo === 'chasis' && !regexChasis.test(input))) {
+    mensaje.textContent = tipo === 'placa'
+      ? 'Dato inválido. Formato: 3 letras MAYÚSCULAS y 3-4 números (Ej: ABC1234).'
+      : 'Código inválido. Debe tener 17 caracteres MAYÚSCULOS y números.';
+    mensaje.style.color = 'red';
+    return;
+  }
+
+  mensaje.textContent = tipo === 'placa' ? 'Placa válida.' : 'Código de chasis válido.';
+  mensaje.style.color = 'green';
+
+  if (datosGuardados[input]) {
+    renderizarDatos(datosGuardados[input], tipo, input);
+  } else {
+    const data = generarDatosAleatorios(tipo, input);
+    datosGuardados[input] = data;
+    renderizarDatos(data, tipo, input);
+  }
+}
+
+function generarDatosAleatorios(tipo, input) {
+  const marcas = Object.keys(marcasModelos);
+  const marca = marcas[Math.floor(Math.random() * marcas.length)];
+  const modelo = marcasModelos[marca][Math.floor(Math.random() * 4)];
+  const anio = Math.floor(Math.random() * (2024 - 2005 + 1)) + 2005;
+  const anioPago = new Date().getFullYear();
+
+  const rubros = ['Multa', 'Impuesto', 'Revisión técnica', 'Parqueo indebido', 'Otros cargos'];
+  const cantidad = Math.floor(Math.random() * 3) + 1;
+
+  let reportes = [], total = 0;
+  for (let i = 0; i < cantidad; i++) {
+    const rubro = rubros[Math.floor(Math.random() * rubros.length)];
+    const valor = Math.floor(Math.random() * (184 - 34 + 1)) + 34;
+    total += valor;
+    reportes.push({ rubro, fecha: generarFechaAleatoria(), valor });
+  }
+
+  return { marca, modelo, anio, anioPago, reportes, total, datoIngresado: input };
+}
+
+function renderizarDatos(data, tipo, input) {
+  document.getElementById('infoVehiculo').innerHTML = `
+    <h3>Información del Vehículo</h3>
+    <p><strong>${tipo === 'placa' ? 'Placa' : 'Chasis'}:</strong> ${input}</p>
+    <p><strong>Marca:</strong> ${data.marca}</p>
+    <p><strong>Modelo:</strong> ${data.modelo}</p>
+    <p><strong>Año:</strong> ${data.anio}</p>
+  `;
+
+  document.getElementById('infoPagoIzq').innerHTML = `
+    <strong style="color: blue;">ÚLTIMO PAGO</strong><br>
+    Año: ${data.anioPago}
+  `;
+
+  let filas = '';
+  data.reportes.forEach(r => {
+    filas += `
+      <tr>
+        <td>${r.rubro}</td>
+        <td>${r.fecha}</td>
+        <td>$${r.valor}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById('tablaReportes').innerHTML = `
+    <h2 style="margin-top: 20px; text-align: center;">Reportes de pago del vehículo</h2>
+    <table border="1" cellpadding="8" cellspacing="0" style="width: 90%; max-width: 800px; text-align: center;">
+      <thead>
+        <tr>
+          <th>Rubro</th>
+          <th>Fecha</th>
+          <th>Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${filas}
+        <tr>
+          <td colspan="2"><strong>Total a Cancelar</strong></td>
+          <td><strong>$${data.total}</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  `;
+
+  // Solo habilitar botones si NO se ha pagado ya ese año con esa placa
+  const keyPago = `${data.datoIngresado}_${data.anioPago}`;
+  const pagoYaRealizado = pagosConfirmados.has(keyPago);
+
+  document.getElementById('metodosPagoDer').innerHTML = `
+    <h4 style="text-transform: uppercase;">MÉTODOS DE PAGO</h4>
+    <p style="text-transform: uppercase;">Total: <span style="font-weight: normal;">$${data.total}</span></p>
+    <div style="display: flex; gap: 10px;">
+      <button ${pagoYaRealizado ? 'disabled' : ''} onclick="abrirModalPagoTarjeta('${data.datoIngresado}')">Tarjeta</button>
+      <button ${pagoYaRealizado ? 'disabled' : ''} onclick="generarBoleto('${data.datoIngresado}', '${data.total}')">Boleto de Pago</button>
+    </div>
+    ${pagoYaRealizado ? '<p style="color: green; font-weight: bold;">Pago ya realizado para esta placa y año.</p>' : ''}
+  `;
+}
+
+function generarFechaAleatoria() {
+  const fechaActual = new Date();
+  const inicio = new Date(fechaActual.getFullYear(), 0, 1); // 1 de enero del año actual
+  const fin = fechaActual; // hoy
+  const diferencia = fin.getTime() - inicio.getTime();
+  const nuevaFecha = new Date(inicio.getTime() + Math.random() * diferencia);
+  return nuevaFecha.toISOString().split('T')[0]; // formato yyyy-mm-dd
+}
+
+function guardarDatos() {
+  const propietario = document.getElementById("propietario").value;
+  const marca = document.getElementById("marca").value;
+  const modelo = document.getElementById("modelo").value;
+
+  if (!propietario || !marca || !modelo) {
+    alert("Por favor complete todos los campos.");
+    return;
+  }
+
+  const reporte = {
+    propietario,
+    marca,
+    modelo,
+    fecha: generarFechaAleatoria() // fecha limitada al día actual
+  };
+
+  datosGuardados.push(reporte);
+  mostrarTabla();
+}
 
 
-            document.getElementById('btnGuardarReporte').addEventListener('click', () => {
-              const nuevoReporte = {
-                id: Date.now(),
-                placa: datos.placa,
-                marca: datos.marca,
-                modelo: datos.modelo,
-                anio: datos.anio,
-                motivoReporte: datos.motivoReporte,
-                valorReporte: datos.valorReporte,
-                valorAPagar: valorConDescuento
-              };
+function generarBoleto(placa, total) {
+  if (verificarPagoUnico(placa)) {
+    confirmarPago(placa, 'Boleto de Pago');
+    const contenido = `BOLETO DE PAGO\n\nDato: ${placa}\nTotal a pagar: $${total}\nCuenta: 1234567890\nBanco: Banco Institucional\nReferencia: ${Math.floor(Math.random() * 1000000000)}`;
+    const blob = new Blob([contenido], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `boleto_pago_${placa}.txt`;
+    link.click();
+  } else {
+    alert('El pago ya fue realizado para esta placa y año.');
+  }
+}
 
-              reportes.push(nuevoReporte);
-              alert('Reporte guardado correctamente.');
-              contenidoVehiculos.innerHTML = '';
-            });
-          });
-        }
+// Valida si se puede pagar o ya fue pagado
+function verificarPagoUnico(placa) {
+  const pago = datosGuardados[placa];
+  if (!pago) return false;
+  const keyPago = `${placa}_${pago.anioPago}`;
+  return !pagosConfirmados.has(keyPago);
+}
 
-        // Mostrar reportes guardados
-        function mostrarReportePagoVehiculo() {
-          if(reportes.length === 0){
-            contenidoVehiculos.innerHTML = `<p style="margin-top:15px;">No hay reportes guardados.</p>`;
-            return;
-          }
+function abrirModalPagoTarjeta(placa) {
+  const pago = datosGuardados[placa];
+  if (!pago) return alert('Debe validar primero la placa.');
 
-          let html = `<div style="margin-top:15px;">`;
-          reportes.forEach(rep => {
-            html += `
-              <div style="background:#e9f1fa; padding:12px; margin-bottom:12px; border-radius:6px; max-width: 400px;">
-                <p><strong>Placa:</strong> ${rep.placa}</p>
-                <p><strong>Marca:</strong> ${rep.marca}</p>
-                <p><strong>Modelo:</strong> ${rep.modelo}</p>
-                <p><strong>Año:</strong> ${rep.anio}</p>
-                <p><strong>Motivo:</strong> ${rep.motivoReporte}</p>
-                <p><strong>Valor a pagar:</strong> $${rep.valorAPagar}</p>
-                <button onclick="abrirModalPago(${rep.id})" style="margin-right:8px; background:#0c3a70; color:white; border:none; border-radius:4px; padding:6px 10px; cursor:pointer;">Pago por tarjeta de crédito</button>
-                <button onclick="generarBoletoPago(${rep.id})" style="background:#0a6f0a; color:white; border:none; border-radius:4px; padding:6px 10px; cursor:pointer;">Generar boleto de pago</button>
-              </div>
-            `;
-          });
-          html += `</div>`;
+  if (!verificarPagoUnico(placa)) {
+    alert('Ya se ha realizado el pago para esta placa y reporte.');
+    return;
+  }
 
-          contenidoVehiculos.innerHTML = html;
-        }
+  const modal = document.getElementById('modalPagoTarjeta');
+  modal.innerHTML = `
+    <h2>Pago con Tarjeta - Total: $${pago.total}</h2>
+    <label>
+      Número de tarjeta:<br/>
+      <input type="text" id="inputNumeroTarjeta" maxlength="16" placeholder="1234123412341234" />
+    </label><br/><br/>
+    <label>
+      Fecha de vencimiento (MM/YYYY):<br/>
+      <input type="text" id="inputFechaVencimiento" maxlength="7" placeholder="MM/YYYY" />
+    </label><br/><br/>
+    <label>
+      Código de seguridad:<br/>
+      <input type="password" id="inputCodigoSeguridad" maxlength="4" placeholder="123" />
+    </label><br/><br/>
+    <button onclick="procesarPagoTarjeta('${placa}')">Confirmar Pago</button>
+    <button onclick="cerrarModalPagoTarjeta()">Cancelar</button>
+  `;
+  modal.style.display = 'block';
+}
 
-        // Modal pago tarjeta
-        let reporteSeleccionado = null;
-        function abrirModalPago(id) {
-          reporteSeleccionado = reportes.find(r => r.id === id);
-          if (!reporteSeleccionado) {
-            alert('Reporte no encontrado');
-            return;
-          }
+function procesarPagoTarjeta(placa) {
+  const numeroTarjeta = document.getElementById('inputNumeroTarjeta').value.trim();
+  const fechaVenc = document.getElementById('inputFechaVencimiento').value.trim();
+  const codigoSeguridad = document.getElementById('inputCodigoSeguridad').value.trim();
 
-          // Crear modal si no existe
-          if (!document.getElementById('modalPagoTarjeta')) {
-            const modalHtml = `
-              <div id="modalPagoTarjeta" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);
-                display:flex; justify-content:center; align-items:center; z-index:1000;">
-                <div style="background:#fff; padding:20px; border-radius:8px; width:320px; position:relative;">
-                  <h3>Pago con tarjeta de crédito</h3>
-                  <label>Número de tarjeta (16 dígitos)</label>
-                  <input type="text" id="tarjetaNumero" maxlength="16" placeholder="1234 5678 9012 3456" style="width:100%; padding:6px; margin-bottom:8px;" />
-                  <label>Código de seguridad (CVV)</label>
-                  <input type="text" id="tarjetaCVV" maxlength="3" placeholder="123" style="width:100%; padding:6px; margin-bottom:8px;" />
-                  <label>Fecha de vencimiento (MM/AA)</label>
-                  <input type="text" id="tarjetaVence" maxlength="5" placeholder="12/24" style="width:100%; padding:6px; margin-bottom:8px;" />
-                  <button id="btnPagarTarjeta" style="background:#0c3a70; color:white; border:none; border-radius:4px; padding:8px 12px; cursor:pointer;">Pagar</button>
-                  <button id="btnCerrarModal" style="margin-top:10px; background:#aaa; color:#333; border:none; border-radius:4px; padding:8px 12px; width:100%; cursor:pointer;">Cerrar</button>
-                </div>
-              </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
+  if (!/^\d{16}$/.test(numeroTarjeta)) {
+    alert('Número de tarjeta inválido. Debe tener 16 dígitos numéricos.');
+    return;
+  }
 
-            document.getElementById('btnCerrarModal').addEventListener('click', cerrarModalPago);
-            document.getElementById('btnPagarTarjeta').addEventListener('click', realizarPago);
-          }
+  const fechaMatch = fechaVenc.match(/^(\d{2})\/(\d{4})$/);
+  if (!fechaMatch) {
+    alert('Fecha de vencimiento inválida. Debe tener formato MM/YYYY.');
+    return;
+  }
+  const mes = parseInt(fechaMatch[1], 10);
+  const año = parseInt(fechaMatch[2], 10);
+  const añoActual = new Date().getFullYear();
+  if (mes < 1 || mes > 12 || año < añoActual || año > 2027) {
+    alert('Fecha de vencimiento fuera de rango.');
+    return;
+  }
 
-          document.getElementById('modalPagoTarjeta').style.display = 'flex';
-          // Limpiar inputs
-          document.getElementById('tarjetaNumero').value = '';
-          document.getElementById('tarjetaCVV').value = '';
-          document.getElementById('tarjetaVence').value = '';
-        }
+  if (!/^\d{3,4}$/.test(codigoSeguridad)) {
+    alert('Código de seguridad inválido. Debe tener 3 o 4 dígitos numéricos.');
+    return;
+  }
 
-        function cerrarModalPago() {
-          document.getElementById('modalPagoTarjeta').style.display = 'none';
-        }
+  confirmarPago(placa, 'Tarjeta');
 
-        function realizarPago() {
-        const num = document.getElementById('tarjetaNumero').value.trim();
-        const cvv = document.getElementById('tarjetaCVV').value.trim();
-        const vence = document.getElementById('tarjetaVence').value.trim();
+  alert('Pago realizado exitosamente.');
 
-        // Validaciones
-        if (!/^\d{16}$/.test(num)) {
-          alert('Número de tarjeta inválido. Debe tener 16 dígitos.');
-          return;
-        }
+  cerrarModalPagoTarjeta();
+  mostrarPagosRealizados();
+}
 
-        if (!/^\d{3}$/.test(cvv)) {
-          alert('Código CVV inválido. Debe tener exactamente 3 dígitos.');
-          return;
-        }
+function cerrarModalPagoTarjeta() {
+  const modal = document.getElementById('modalPagoTarjeta');
+  modal.style.display = 'none';
+}
 
-        if (!/^\d{2}\/\d{2}$/.test(vence)) {
-          alert('Fecha de vencimiento inválida. Use formato MM/AA.');
-          return;
-        }
+function confirmarPago(placa, metodo = 'Tarjeta') {
+  const pago = datosGuardados[placa];
+  if (!pago) return;
 
-        const [mesStr, anioStr] = vence.split('/');
-        const mes = parseInt(mesStr, 10);
-        const anio = parseInt('20' + anioStr, 10);
+  const keyPago = `${placa}_${pago.anioPago}`;
+  if (pagosConfirmados.has(keyPago)) {
+    alert('Ya se ha realizado el pago para esta placa y reporte.');
+    return;
+  }
 
-        if (mes < 1 || mes > 12) {
-          alert('Mes inválido. Debe estar entre 01 y 12.');
-          return;
-        }
+  // Generar datos aleatorios persona (hombre o mujer al azar)
+  const esHombre = Math.random() < 0.5;
+  let nombre, apellido;
+  if (esHombre) {
+    nombre = nombresHombres[Math.floor(Math.random() * nombresHombres.length)];
+    apellido = apellidosHombres[Math.floor(Math.random() * apellidosHombres.length)];
+  } else {
+    nombre = nombresMujeres[Math.floor(Math.random() * nombresMujeres.length)];
+    apellido = apellidosMujeres[Math.floor(Math.random() * apellidosMujeres.length)];
+  }
 
-        if (anio > 2026) {
-          alert('Año inválido. Solo se permiten tarjetas hasta 2026.');
-          return;
-        }
+  // Generar cédula aleatoria (ecuador, 10 dígitos)
+  const cedula = generarCedulaAleatoria();
 
-        // Pago exitoso
-        alert(`✅ Pago realizado exitosamente para la placa ${reporteSeleccionado.placa}.`);
+  pagosConfirmados.add(keyPago);
 
-        // Eliminar el reporte del arreglo
-        reportes.splice(reportes.findIndex(r => r.id === reporteSeleccionado.id), 1);
+  if (!pagosRealizados[placa]) pagosRealizados[placa] = [];
 
-        // Cerrar y actualizar vista
-        cerrarModalPago();
-        mostrarReportePagoVehiculo();
-      }
+  pagosRealizados[placa].push({
+    anio: pago.anioPago,
+    datos: pago.reportes,
+    total: pago.total,
+    metodoPago: metodo,
+    nombreCompleto: `${nombre} ${apellido}`,
+    cedula,
+    datoIngresado: placa
+  });
+
+  // Actualizar interfaz para deshabilitar botones después del pago
+  renderizarDatos(pago, 'placa', placa);
+}
+
+function generarCedulaAleatoria() {
+  const provincia = String(Math.floor(Math.random() * 24) + 1).padStart(2, '0'); // 01 a 24
+  const tercerDigito = Math.floor(Math.random() * 6); // 0 a 5 (persona natural)
+  const coeficientes = [2, 1, 2, 1, 2, 1, 2, 1, 2];
+  let cedulaSinVerificador = provincia + tercerDigito;
+
+  // Generar los siguientes 6 dígitos aleatorios (total 9 sin el verificador)
+  for (let i = 0; i < 6; i++) {
+    cedulaSinVerificador += Math.floor(Math.random() * 10).toString();
+  }
+
+  // Calcular dígito verificador
+  let suma = 0;
+  for (let i = 0; i < 9; i++) {
+    let valor = parseInt(cedulaSinVerificador[i]) * coeficientes[i];
+    if (valor >= 10) valor -= 9;
+    suma += valor;
+  }
+
+  const residuo = suma % 10;
+  const digitoVerificador = residuo === 0 ? 0 : 10 - residuo;
+
+  return cedulaSinVerificador + digitoVerificador;
+}
 
 
-        function generarBoletoPago(id) {
-        const reporte = reportes.find(r => r.id === id);
-        if (!reporte) {
-          alert('Reporte no encontrado.');
-          return;
-        }
+function verDetalles(index, placa) {
+  const pago = pagosRealizados[placa][index];
+  const modal = document.getElementById('modalDetallesPago');
 
-        const contenido = `
-          ====== BOLETO DE PAGO ======
-          Placa: ${reporte.placa}
-          Marca: ${reporte.marca}
-          Modelo: ${reporte.modelo}
-          Año: ${reporte.anio}
-          Motivo: ${reporte.motivoReporte}
-          Valor a pagar: $${reporte.valorAPagar}
+  let filasDetalle = '';
+  pago.datos.forEach(r => {
+    filasDetalle += `
+      <tr>
+        <td>${r.rubro}</td>
+        <td>${r.fecha}</td>
+        <td>$${r.valor}</td>
+      </tr>
+    `;
+  });
 
-          Cuenta Institucional Gobierno:
-          Banco: Banco del Estado
-          Número de cuenta: 1234567890
-          Tipo de cuenta: Corriente
+  modal.innerHTML = `
+    <h2>Detalles del pago (${pago.anio})</h2>
+    <p><strong>Nombre:</strong> ${pago.nombreCompleto}</p>
+    <p><strong>Cédula:</strong> ${pago.cedula}</p>
+    <p><strong>Dato ingresado:</strong> ${pago.datoIngresado}</p>
+    <p><strong>Método de pago:</strong> ${pago.metodoPago}</p>
+    <table border="1" cellpadding="6" cellspacing="0" style="width: 100%; text-align:center; margin-top: 10px;">
+      <thead>
+        <tr><th>Rubro</th><th>Fecha</th><th>Valor</th></tr>
+      </thead>
+      <tbody>
+        ${filasDetalle}
+        <tr>
+          <td colspan="2"><strong>Total</strong></td>
+          <td><strong>$${pago.total}</strong></td>
+        </tr>
+      </tbody>
+    </table>
+    <button onclick="cerrarModal()" style="margin-top: 15px;">Cerrar</button>
+  `;
+  modal.style.display = 'block';
+}
 
-          Para realizar el pago, use su banca electrónica o acuda al banco con esta información.
-          Fecha de emisión: ${new Date().toLocaleDateString()}
-        `;
+function cerrarModal() {
+  const modal = document.getElementById('modalDetallesPago');
+  modal.style.display = 'none';
+}
 
-        // Crear archivo txt para descarga
-        const blob = new Blob([contenido], { type: 'text/plain' });
-        const enlace = document.createElement('a');
-        enlace.href = URL.createObjectURL(blob);
-        enlace.download = `boleto_pago_${reporte.placa}.txt`;
-        document.body.appendChild(enlace);
-        enlace.click();
-        document.body.removeChild(enlace);
 
-        // Eliminar reporte del array
-        reportes.splice(reportes.findIndex(r => r.id === id), 1);
 
-        // Actualizar la vista
-        mostrarReportePagoVehiculo();
-      }
+//======================================================================================================================
 
 
 
