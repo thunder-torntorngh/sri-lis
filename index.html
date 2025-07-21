@@ -27,6 +27,102 @@
       }
 
 
+      .consulta-container {
+  background: #ffffff;
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 6px;
+  max-width: 600px;
+  margin: 20px auto;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.consulta-container h3 {
+  color: #004884;
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.input {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.btn-consultar {
+  width: 100%;
+  background: #004884;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  font-size: 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-consultar:hover {
+  background: #003366;
+}
+
+.resultado-consulta {
+  margin-top: 20px;
+}
+
+.resultado-header p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.tabla-rubros {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.tabla-rubros th,
+.tabla-rubros td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  font-size: 14px;
+}
+
+.tabla-rubros th {
+  background: #f5f5f5;
+  text-align: center;
+}
+
+.tabla-rubros tfoot td {
+  background: #f9f9f9;
+  font-size: 15px;
+}
+
+.resultado-acciones {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.resultado-acciones button {
+  background: #0066cc;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.resultado-acciones button:hover {
+  background: #0055aa;
+}
+
+
+
       /* --- Login --- */
       #login-container {
         position: fixed;
@@ -367,6 +463,49 @@
         background-color: #218838;
     }
 
+      .consulta-container {
+    background-color: #f0f4f8;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: 20px auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-family: Arial, sans-serif;
+  }
+
+  .consulta-container h3 {
+    color: #003366;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  .input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .btn-consultar {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+  }
+
+  .btn-consultar:hover {
+    background-color: #004a99;
+  }
+
+  .resultado-consulta {
+    margin-top: 20px;
+  }
+
       
     </style>
 
@@ -433,6 +572,7 @@
           <div id="contenidoDIMM"></div>
         </section>
 
+
         <!-- Módulo de Vehículos -->
         <section id="vehiculos" class="modulo" style="display: none; text-align: center;">
           <h2>Consultar sus reportes</h2>
@@ -446,6 +586,11 @@
           <div id="modalDetallesPago" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:2px solid #444; max-width:90%; max-height:80%; overflow-y:auto; z-index:1000;"></div>
           <div id="modalPagoTarjeta" style="display:none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); background: white; border: 2px solid #444; padding: 20px; max-width: 400px; z-index: 10000;"></div>
         </section>
+
+
+
+
+
 
         <!-- Módulo Deudas -->
         <section id="deudas" class="modulo" style="display:center;">
@@ -1327,7 +1472,8 @@
         descargarTxt("factura_electronica.xml", xml);
       }
 
-      //=======================================  VEHICULO  ===============================================
+
+//=======================================  VEHICULO  ===============================================
 
 
 const marcasModelos = {
@@ -1775,7 +1921,6 @@ function cerrarModal() {
 //======================================================================================================================
 
 
-
         // Simulación de datos base (podrías conectar con tus arrays reales más adelante)
         // 🟦 Valores iniciales
         let datosSistema = {
@@ -2048,7 +2193,6 @@ function cerrarModal() {
 
           mensajeDiv.innerHTML = `<p style="color:green;">Solicitud enviada para ${cuotas} cuotas al RUC/Cédula ${cedula}. (Simulación)</p>`;
         }
-
     </script>
 
     <footer  style="text-align:justify; background: #004b8d; color: white; position: fixed; bottom: 0; width: 100%; height: auto; margin: auto;">
