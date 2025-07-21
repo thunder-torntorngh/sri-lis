@@ -2024,176 +2024,357 @@ function cerrarModal() {
         }
 
 
-      let deudasUsuario = [];
+      //===========================================================================================================================================0
+      //=============================================================================== DEUDAS =================================================0
+      //===========================================================================================================================================0
 
-        function mostrarConsultaDeudas() {
-          // Limpiar contenido y deshabilitar botones pagar/facilidades
-          document.getElementById("contenidoDeudas").innerHTML = `
-            <h3>Consulta de Deudas</h3>
-            <label>Cédula/RUC:</label>
-            <input type="text" id="cedulaConsulta" placeholder="Ej: 0102030405">
-            <button onclick="validarConsultaDeudas()">Consultar</button>
-            <div id="resultadoConsulta" style="margin-top: 10px;"></div>
-          `;
-          document.getElementById("btnPagarDeudas").disabled = true;
-          document.getElementById("btnFacilidadesPago").disabled = true;
-        }
+   // Registro de resultados por cédula// Registro de resultados por cédula
+const registroDeudasPorCedula = {};
+let deudasUsuario = [];
 
-        function validarConsultaDeudas() {
-          const cedula = document.getElementById("cedulaConsulta").value.trim();
-          const resultadoDiv = document.getElementById("resultadoConsulta");
+// Validación real de cédula ecuatoriana (versión oficial)
+function validarCedula(cedula) {
+  if (!/^\d{10}$/.test(cedula)) return false;
+  const digitos = cedula.split('').map(Number);
+  const provincia = parseInt(cedula.substring(0, 2));
+  if (provincia < 1 || provincia > 24) return false;
 
-          if (cedula.length < 10) {
-            alert("Por favor ingresa un número válido de cédula o RUC.");
-            return;
-          }
+  let suma = 0;
+  for (let i = 0; i < 9; i++) {
+    let mult = digitos[i] * (i % 2 === 0 ? 2 : 1);
+    if (mult > 9) mult -= 9;
+    suma += mult;
+  }
 
-          // Simulación de consulta: Generamos aleatoriamente si hay o no deuda
-          const tieneDeuda = Math.random() < 0.6; // 60% probabilidad de deuda
+  const verificador = (10 - (suma % 10)) % 10;
+  return verificador === digitos[9];
+}
 
-          if (!tieneDeuda) {
-            deudasUsuario = []; // Vaciar listado
-            resultadoDiv.innerHTML = `<p style="color:green;">No tiene deudas registradas para el RUC/Cédula ${cedula}.</p>`;
-            document.getElementById("btnPagarDeudas").disabled = true;
-            document.getElementById("btnFacilidadesPago").disabled = true;
-            return;
-          }
+// --- FUNCIONES PARA CONSULTA DE DEUDAS ---
 
-          // Si tiene deudas, simulamos un listado (puedes ajustar estos datos)
-          deudasUsuario = [
-            { id: "D001", descripcion: "Impuesto Renta 2024", monto: 350.00 },
-            { id: "D002", descripcion: "Multa por declaración tardía", monto: 50.00 },
-          ];
+function mostrarConsultaDeudas() {
+  document.getElementById("contenidoDeudas").innerHTML = `
+    <h3>Consulta de Deudas</h3>
+    <label>Cédula/RUC:</label>
+    <input type="text" id="cedulaConsulta" placeholder="Ej: 0102030405">
+    <button onclick="validarConsultaDeudas()">Consultar</button>
+    <div id="resultadoConsulta" style="margin-top: 10px;"></div>
+  `;
+  document.getElementById("btnPagarDeudas").disabled = true;
+  document.getElementById("btnFacilidadesPago").disabled = true;
+}
 
-          let htmlReporte = `<p style="color:red;">Se encontraron ${deudasUsuario.length} deudas para el RUC/Cédula ${cedula}:</p><ul>`;
-          deudasUsuario.forEach(deuda => {
-            htmlReporte += `<li><strong>${deuda.descripcion}</strong> - $${deuda.monto.toFixed(2)} (ID: ${deuda.id})</li>`;
-          });
-          htmlReporte += "</ul>";
+// Genera deudas aleatorias con probabilidad escalonada para 1-2 o 3 deudas
+function generarDeudasAleatorias() {
+  const opcionesDeudas = [
+    { id: "D001", descripcion: "Impuesto Renta 2024", montoMin: 200, montoMax: 800 },
+    { id: "D002", descripcion: "Multa por declaración tardía", montoMin: 30, montoMax: 100 },
+    { id: "D003", descripcion: "Contribución solidaria", montoMin: 100, montoMax: 400 },
+    { id: "D004", descripcion: "Intereses por mora", montoMin: 10, montoMax: 60 },
+    { id: "D005", descripcion: "Recargo IVA", montoMin: 50, montoMax: 150 },
+    { id: "D006", descripcion: "Multa ambiental", montoMin: 80, montoMax: 300 },
+    { id: "D007", descripcion: "Tasa municipal", montoMin: 20, montoMax: 90 },
+    { id: "D008", descripcion: "Mora servicio eléctrico", montoMin: 50, montoMax: 200 },
+    { id: "D009", descripcion: "Servicio médico privado", montoMin: 100, montoMax: 250 },
+    { id: "D010", descripcion: "Pago internet domiciliario", montoMin: 40, montoMax: 120 }
+  ];
 
-          resultadoDiv.innerHTML = htmlReporte;
+  // Mayor probabilidad para 1 o 2 deudas, menos para 3
+  const cantidad = Math.random() < 0.65 ? Math.floor(Math.random() * 2) + 1 : 3;
+  const copia = [...opcionesDeudas];
+  const seleccionadas = [];
 
-          // Habilitar botones de pago y facilidades
-          document.getElementById("btnPagarDeudas").disabled = false;
-          document.getElementById("btnFacilidadesPago").disabled = false;
-        }
+  for (let i = 0; i < cantidad; i++) {
+    const index = Math.floor(Math.random() * copia.length);
+    const deuda = copia.splice(index, 1)[0];
+    const monto = Math.random() * (deuda.montoMax - deuda.montoMin) + deuda.montoMin;
 
-        function mostrarPagoDeudas() {
-          if(deudasUsuario.length === 0){
-            alert("No hay deudas registradas para pagar.");
-            return;
-          }
+    seleccionadas.push({
+      id: deuda.id,
+      descripcion: deuda.descripcion,
+      monto: parseFloat(monto.toFixed(2))
+    });
+  }
 
-          let contenido = `
-            <h3>Pagar Deudas</h3>
-            <label>Selecciona la deuda a pagar:</label>
-            <select id="selectDeudaPago">
-              ${deudasUsuario.map(d => `<option value="${d.id}">${d.descripcion} - $${d.monto.toFixed(2)}</option>`).join('')}
-            </select>
-            <label>Monto a pagar:</label>
-            <input type="number" id="montoPago" min="0.01" step="0.01" placeholder="Ej: 100.00" value="${deudasUsuario[0].monto.toFixed(2)}">
-            <button onclick="validarPagoDeudas()">Pagar</button>
-            <div id="mensajePago" style="margin-top:10px;"></div>
-          `;
+  return seleccionadas;
+}
 
-          document.getElementById("contenidoDeudas").innerHTML = contenido;
+function validarConsultaDeudas() {
+  const cedula = document.getElementById("cedulaConsulta").value.trim();
+  const resultadoDiv = document.getElementById("resultadoConsulta");
 
-          // Al cambiar deuda seleccionada, actualizar monto automáticamente
-          document.getElementById("selectDeudaPago").addEventListener('change', function(){
-            const selectedId = this.value;
-            const deuda = deudasUsuario.find(d => d.id === selectedId);
-            if(deuda){
-              document.getElementById("montoPago").value = deuda.monto.toFixed(2);
-            }
-          });
-        }
+  if (!validarCedula(cedula)) {
+    alert("Cédula inválida. Ingrese una cédula ecuatoriana válida.");
+    return;
+  }
 
-        function validarPagoDeudas() {
-          const id = document.getElementById("selectDeudaPago").value;
-          const montoInput = document.getElementById("montoPago").value;
-          const monto = parseFloat(montoInput);
-          const mensajeDiv = document.getElementById("mensajePago");
+  if (registroDeudasPorCedula.hasOwnProperty(cedula)) {
+    deudasUsuario = registroDeudasPorCedula[cedula];
+  } else {
+    const tieneDeuda = Math.random() < 0.6;
+    deudasUsuario = tieneDeuda ? generarDeudasAleatorias() : [];
+    registroDeudasPorCedula[cedula] = deudasUsuario;
+  }
 
-          if (!id || isNaN(monto) || monto <= 0) {
-            alert("Completa correctamente los campos para procesar el pago.");
-            return;
-          }
+  if (deudasUsuario.length === 0) {
+    resultadoDiv.innerHTML = `<p style="color:green;">No tiene deudas registradas para el RUC/Cédula ${cedula}.</p>`;
+    document.getElementById("btnPagarDeudas").disabled = true;
+    document.getElementById("btnFacilidadesPago").disabled = true;
+    return;
+  }
 
-          const deuda = deudasUsuario.find(d => d.id === id);
-          if (!deuda) {
-            alert("Deuda no encontrada.");
-            return;
-          }
+  let html = `<p style="color:red;">Se encontraron ${deudasUsuario.length} deudas para el RUC/Cédula ${cedula}:</p><ul>`;
+  deudasUsuario.forEach(d => {
+    html += `<li><strong>${d.descripcion}</strong> - $${d.monto.toFixed(2)} (ID: ${d.id})</li>`;
+  });
+  html += "</ul>";
 
-          if (monto > deuda.monto) {
-            alert(`El monto a pagar no puede ser mayor al total de la deuda ($${deuda.monto.toFixed(2)}).`);
-            return;
-          }
+  resultadoDiv.innerHTML = html;
+  document.getElementById("btnPagarDeudas").disabled = false;
+  document.getElementById("btnFacilidadesPago").disabled = false;
+}
 
-          // Simular pago parcial o total
-          deuda.monto -= monto;
+// --- FUNCIONES PARA PAGAR DEUDAS ---
 
-          let msg = `Pago realizado por $${monto.toFixed(2)} para la deuda "${deuda.descripcion}". `;
+function mostrarPagoDeudas() {
+  if (deudasUsuario.length === 0) {
+    alert("No hay deudas registradas para pagar.");
+    return;
+  }
 
-          if (deuda.monto <= 0.01) {
-            // Eliminar deuda si saldo es 0 o menor
-            deudasUsuario = deudasUsuario.filter(d => d.id !== id);
-            msg += "Deuda saldada completamente.";
-          } else {
-            msg += `Saldo restante: $${deuda.monto.toFixed(2)}.`;
-          }
+  let contenido = `
+    <h3>Pagar Deudas</h3>
+    <label>Selecciona la deuda a pagar:</label>
+    <select id="selectDeudaPago">
+      ${deudasUsuario.map(d => `<option value="${d.id}">${d.descripcion} - $${d.monto.toFixed(2)}</option>`).join('')}
+    </select>
+    <label>Monto a pagar:</label>
+    <input type="number" id="montoPago" min="0.01" step="0.01" placeholder="Ej: 100.00" value="${deudasUsuario[0].monto.toFixed(2)}">
+    <button onclick="validarPagoDeudas()">Pagar</button>
+    <div id="mensajePago" style="margin-top:10px;"></div>
+  `;
 
-          mensajeDiv.innerHTML = `<p style="color:green;">${msg}</p>`;
+  document.getElementById("contenidoDeudas").innerHTML = contenido;
 
-          // Actualizar select y monto
-          if(deudasUsuario.length === 0){
-            document.getElementById("contenidoDeudas").innerHTML = `<p>No quedan deudas pendientes.</p>`;
-            document.getElementById("btnPagarDeudas").disabled = true;
-            document.getElementById("btnFacilidadesPago").disabled = true;
-          } else {
-            mostrarPagoDeudas();
-          }
-        }
+  document.getElementById("selectDeudaPago").addEventListener('change', function () {
+    const selectedId = this.value;
+    const deuda = deudasUsuario.find(d => d.id === selectedId);
+    if (deuda) {
+      document.getElementById("montoPago").value = deuda.monto.toFixed(2);
+    }
+  });
+}
 
-        function mostrarFacilidadesPago() {
-          if(deudasUsuario.length === 0){
-            alert("No hay deudas registradas para solicitar facilidades.");
-            return;
-          }
+function validarPagoDeudas() {
+  const id = document.getElementById("selectDeudaPago").value;
+  const montoInput = document.getElementById("montoPago").value;
+  const monto = parseFloat(montoInput);
+  const mensajeDiv = document.getElementById("mensajePago");
 
-          let contenido = `
-            <h3>Solicitar Facilidades de Pago</h3>
-            <label>Cédula/RUC:</label>
-            <input type="text" id="cedulaFacilidad" placeholder="Ej: 0102030405">
-            <label>Cuotas:</label>
-            <input type="number" id="cuotas" min="1" placeholder="Ej: 6">
-            <button onclick="validarFacilidadesPago()">Solicitar</button>
-            <div id="mensajeFacilidad" style="margin-top:10px;"></div>
-          `;
+  if (!id || isNaN(monto) || monto <= 0) {
+    alert("Completa correctamente los campos para procesar el pago.");
+    return;
+  }
 
-          document.getElementById("contenidoDeudas").innerHTML = contenido;
-        }
+  const deuda = deudasUsuario.find(d => d.id === id);
+  if (!deuda) {
+    alert("Deuda no encontrada.");
+    return;
+  }
 
-        function validarFacilidadesPago() {
-          const cedula = document.getElementById("cedulaFacilidad").value.trim();
-          const cuotas = parseInt(document.getElementById("cuotas").value);
-          const mensajeDiv = document.getElementById("mensajeFacilidad");
+  if (monto > deuda.monto) {
+    alert(`El monto a pagar no puede ser mayor al total de la deuda ($${deuda.monto.toFixed(2)}).`);
+    return;
+  }
 
-          if (cedula.length < 10) {
-            alert("Por favor ingresa un número válido de cédula o RUC.");
-            return;
-          }
-          if (isNaN(cuotas) || cuotas < 1) {
-            alert("Ingresa un número válido de cuotas.");
-            return;
-          }
-          if (deudasUsuario.length === 0) {
-            alert("No hay deudas para solicitar facilidades de pago.");
-            return;
-          }
+  deuda.monto -= monto;
 
-          mensajeDiv.innerHTML = `<p style="color:green;">Solicitud enviada para ${cuotas} cuotas al RUC/Cédula ${cedula}. (Simulación)</p>`;
-        }
+  let msg = `Pago realizado por $${monto.toFixed(2)} para la deuda "${deuda.descripcion}". `;
+
+  if (deuda.monto <= 0.01) {
+    deudasUsuario = deudasUsuario.filter(d => d.id !== id);
+    msg += "Deuda saldada completamente.";
+  } else {
+    msg += `Saldo restante: $${deuda.monto.toFixed(2)}.`;
+  }
+
+  mensajeDiv.innerHTML = `<p style="color:green;">${msg}</p>`;
+
+  if (deudasUsuario.length === 0) {
+    document.getElementById("contenidoDeudas").innerHTML = `<p>No quedan deudas pendientes.</p>`;
+    document.getElementById("btnPagarDeudas").disabled = true;
+    document.getElementById("btnFacilidadesPago").disabled = true;
+  } else {
+    mostrarPagoDeudas();
+  }
+}
+
+// --- FUNCIONES PARA FACILIDADES DE PAGO ---
+
+// Muestra solo input para cédula al principio
+function mostrarFacilidadesPago() {
+  document.getElementById("contenidoDeudas").innerHTML = `
+    <h3>Solicitar Facilidades de Pago</h3>
+    <label>Cédula/RUC:</label>
+    <input type="text" id="cedulaFacilidad" placeholder="Ej: 0102030405" oninput="cargarDeudasFacilidad()">
+    <div id="deudasFacilidad" style="margin-top:10px;"></div>
+    <div id="facilidadOpciones" style="margin-top:10px;"></div>
+    <div id="mensajeFacilidad" style="margin-top:10px;"></div>
+  `;
+}
+
+// Al ingresar la cédula se cargan las deudas si existen
+function cargarDeudasFacilidad() {
+  const cedula = document.getElementById("cedulaFacilidad").value.trim();
+  const divDeudas = document.getElementById("deudasFacilidad");
+  const divOpciones = document.getElementById("facilidadOpciones");
+  const mensajeDiv = document.getElementById("mensajeFacilidad");
+
+  mensajeDiv.innerHTML = "";
+  divOpciones.innerHTML = "";
+  divDeudas.innerHTML = "";
+
+  if (!validarCedula(cedula)) {
+    // Si no es válida o está incompleta, no mostrar nada más
+    return;
+  }
+
+  if (!registroDeudasPorCedula.hasOwnProperty(cedula)) {
+    divDeudas.innerHTML = `<p style="color:green;">No se encontraron deudas para la cédula ${cedula}.</p>`;
+    return;
+  }
+
+  deudasUsuario = registroDeudasPorCedula[cedula];
+  if (deudasUsuario.length === 0) {
+    divDeudas.innerHTML = `<p style="color:green;">No se encontraron deudas para la cédula ${cedula}.</p>`;
+    return;
+  }
+
+  // Mostrar las deudas con checkboxes para selección
+  let html = `<p><strong>Deudas encontradas:</strong></p><ul>`;
+  deudasUsuario.forEach((d, i) => {
+    html += `
+      <li>
+        <input type="checkbox" class="checkDeuda" id="deuda${i}" value="${d.id}" checked>
+        <label for="deuda${i}">${d.descripcion} - $${d.monto.toFixed(2)}</label>
+      </li>`;
+  });
+  html += "</ul>";
+  divDeudas.innerHTML = html;
+
+  // Mostrar opciones de cuotas y botón solicitar
+  const totalDeuda = deudasUsuario.reduce((sum, d) => sum + d.monto, 0);
+  divOpciones.innerHTML = `
+    <p><strong>Total deudas (sin filtrar):</strong> $${totalDeuda.toFixed(2)}</p>
+    <label>Selecciona número de cuotas (entre 10 y 20):</label>
+    <select id="cuotasSelect" onchange="actualizarDetalleCuota()">
+      ${Array.from({ length: 11 }, (_, i) => i + 10).map(q => `<option value="${q}">${q} cuotas</option>`).join('')}
+    </select>
+    <p id="detalleCuota" style="margin-top:8px;"></p>
+    <button onclick="validarFacilidadesPago()">Solicitar</button>
+  `;
+  actualizarDetalleCuota();
+}
+
+// Actualiza el detalle del valor de la cuota según selección y deudas marcadas
+function actualizarDetalleCuota() {
+  const cuotas = parseInt(document.getElementById("cuotasSelect").value);
+  const checkboxes = document.querySelectorAll(".checkDeuda");
+  let sumaSeleccionadas = 0;
+  checkboxes.forEach(chk => {
+    if (chk.checked) {
+      const deuda = deudasUsuario.find(d => d.id === chk.value);
+      if (deuda) sumaSeleccionadas += deuda.monto;
+    }
+  });
+
+  if (sumaSeleccionadas === 0) {
+    document.getElementById("detalleCuota").innerHTML = `<em>Debe seleccionar al menos una deuda.</em>`;
+  } else {
+    const valorCuota = sumaSeleccionadas / cuotas;
+    document.getElementById("detalleCuota").innerHTML = `Cada cuota será de: <strong>$${valorCuota.toFixed(2)}</strong>`;
+  }
+}
+
+// Validación y envío de solicitud de facilidad de pago + generación archivo .txt
+function validarFacilidadesPago() {
+  const cedula = document.getElementById("cedulaFacilidad").value.trim();
+  const cuotas = parseInt(document.getElementById("cuotasSelect").value);
+  const mensajeDiv = document.getElementById("mensajeFacilidad");
+
+  if (!validarCedula(cedula)) {
+    alert("Cédula inválida. Ingrese una cédula ecuatoriana válida.");
+    return;
+  }
+
+  if (isNaN(cuotas) || cuotas < 10 || cuotas > 20) {
+    alert("Selecciona un número de cuotas entre 10 y 20.");
+    return;
+  }
+
+  const checkboxes = document.querySelectorAll(".checkDeuda");
+  let deudasSeleccionadas = [];
+  checkboxes.forEach(chk => {
+    if (chk.checked) {
+      const deuda = deudasUsuario.find(d => d.id === chk.value);
+      if (deuda) deudasSeleccionadas.push(deuda);
+    }
+  });
+
+  if (deudasSeleccionadas.length === 0) {
+    alert("Debe seleccionar al menos una deuda para solicitar facilidades.");
+    return;
+  }
+
+  // Calcular total de la selección
+  const totalSeleccion = deudasSeleccionadas.reduce((sum, d) => sum + d.monto, 0);
+  const valorCuota = totalSeleccion / cuotas;
+
+  // Mostrar mensaje confirmación
+  mensajeDiv.innerHTML = `
+    <p style="color:green;">
+      Solicitud enviada correctamente.<br>
+      Total deuda seleccionada: $${totalSeleccion.toFixed(2)}<br>
+      Número de cuotas: ${cuotas}<br>
+      Valor por cuota: $${valorCuota.toFixed(2)}
+    </p>
+  `;
+
+  // Generar archivo .txt con los datos
+  generarArchivoTxtFacilidad(cedula, deudasSeleccionadas, cuotas, valorCuota);
+}
+
+// Función para generar archivo .txt y descargarlo automáticamente
+function generarArchivoTxtFacilidad(cedula, deudasSeleccionadas, cuotas, valorCuota) {
+  // Generar nombre aleatorio simple para el ejemplo (puedes cambiar a un nombre real si quieres)
+  const nombresEjemplo = ["Carlos Pérez", "Ana Gómez", "Luis Rodríguez", "María Sánchez", "Jorge Torres"];
+  const nombreAleatorio = nombresEjemplo[Math.floor(Math.random() * nombresEjemplo.length)];
+
+  let contenido = `Solicitud de Facilidades de Pago\n`;
+  contenido += `Nombre: ${nombreAleatorio}\n`;
+  contenido += `Cédula: ${cedula}\n\n`;
+  contenido += `Deudas seleccionadas:\n`;
+  deudasSeleccionadas.forEach(d => {
+    contenido += `- ${d.descripcion}: $${d.monto.toFixed(2)}\n`;
+  });
+  contenido += `\nNúmero de cuotas: ${cuotas}\n`;
+  contenido += `Valor por cuota: $${valorCuota.toFixed(2)}\n`;
+  contenido += `Fecha solicitud: ${new Date().toLocaleString()}\n`;
+
+  // Crear Blob y forzar descarga
+  const blob = new Blob([contenido], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `solicitud_facilidad_${cedula}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+        //===========================================================================================================================================0
+        //===========================================================================================================================================0
     </script>
 
     <footer  style="text-align:justify; background: #004b8d; color: white; position: fixed; bottom: 0; width: 100%; height: auto; margin: auto;">
