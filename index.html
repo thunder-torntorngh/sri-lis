@@ -578,7 +578,7 @@
           <h2>Consultar sus reportes</h2>
           <div class="subopciones">
             <button onclick="mostrarConsultaVehiculo('placa')">Consultar reportes</button>
-            <button onclick="mostrarPagosRealizados()">Reportes de pago</button>
+            <button onclick="volverAConsulta()" class="btn-volver">Volver a Consulta </button>
           </div>
 
           <div id="contenidoVehiculo"></div>
@@ -960,6 +960,9 @@
           }
         }
 
+        //================================================== Anexos =============================================
+        //=======================================================================================================
+
       let idEditar = null;
 
       // Mostrar módulo para crear/editar anexos, importar, descargar, enviar y eliminar
@@ -1063,80 +1066,89 @@
         }
       }
 
-      function guardarAnexo() {
-        const nombre = document.getElementById('nombreAnexo').value.trim();
-        const contenido = document.getElementById('contenidoAnexo').value.trim();
+function guardarAnexo() {
+    const nombre = document.getElementById('nombreAnexo').value.trim();
+    const contenido = document.getElementById('contenidoAnexo').value.trim();
 
-        if (!nombre) {
-          alert("Debe ingresar un nombre para el anexo");
-          return;
-        }
-        if (!contenido) {
-          alert("El contenido no puede estar vacío");
-          return;
-        }
+    // Validaciones
+    if (!nombre) {
+        alert("Debe ingresar un nombre para el anexo");
+        return;
+    }
+    if (!contenido) {
+        alert("El contenido no puede estar vacío");
+        return;
+    }
 
-        if (idEditar === null) {
-          anexosGuardados.push({
-            id: Date.now(),
+    if (idEditar === null) {
+        // Agregar nuevo anexo
+        anexosGuardados.push({
+            id: Date.now(), // Generar un ID único basado en la fecha
             nombre,
             contenido
-          });
-          alert("Anexo guardado con éxito");
-        } else {
-          const index = anexosGuardados.findIndex(a => a.id === idEditar);
-          if (index > -1) {
+        });
+        alert("Anexo guardado con éxito");
+    } else {
+        // Actualizar anexo existente
+        const index = anexosGuardados.findIndex(a => a.id === idEditar);
+        if (index !== -1) {
+            // Actualizar el anexo en la posición encontrada
             anexosGuardados[index].nombre = nombre;
             anexosGuardados[index].contenido = contenido;
             alert("Anexo actualizado con éxito");
-          }
         }
+        idEditar = null; // Limpiar el ID de edición después de guardar
+    }
 
-        limpiarForm();
-        mostrarListaAnexos();
-      }
+    limpiarForm(); // Limpiar el formulario
+    mostrarListaAnexos(); // Volver a mostrar la lista de anexos
+}
 
-      function renderizarAnexos() {
-        const lista = document.getElementById("listaAnexos");
-        lista.innerHTML = "";
+function renderizarAnexos() {
+    const lista = document.getElementById("listaAnexos");
+    lista.innerHTML = ""; // Limpiar la lista antes de renderizar
 
-        if (anexosGuardados.length === 0) {
-          lista.innerHTML = "<p>No hay anexos guardados.</p>";
-          return;
-        }
+    if (anexosGuardados.length === 0) {
+        lista.innerHTML = "<p>No hay anexos guardados.</p>";
+        return;
+    }
 
-        anexosGuardados.forEach(anexo => {
-          const div = document.createElement("div");
-          div.style.border = "1px solid #ccc";
-          div.style.padding = "10px";
-          div.style.marginBottom = "10px";
-          div.style.borderRadius = "5px";
+    anexosGuardados.forEach(anexo => {
+        const div = document.createElement("div");
+        div.style.border = "1px solid #ccc";
+        div.style.padding = "10px";
+        div.style.marginBottom = "10px";
+        div.style.borderRadius = "5px";
 
-          div.innerHTML = `
+        div.innerHTML = `
             <strong>Nombre:</strong> ${anexo.nombre}<br/><br/>
             <pre style="background:#f4f4f4; padding:10px; border-radius:4px; max-height:150px; overflow:auto;">${anexo.contenido}</pre>
             <div style="margin-top: 10px;">
-              <button onclick="editarAnexo(${anexo.id})">✏️ Editar</button>
-              <button onclick="descargarAnexo(${anexo.id})">📥 Descargar</button>
-              <button onclick="simularEnvio(${anexo.id})">📤 Enviar</button>
-              <button onclick="eliminarAnexo(${anexo.id})" style="color:red;">🗑️ Eliminar</button>
+                <button onclick="editarAnexo(${anexo.id})">✏️ Editar</button>
+                <button onclick="descargarAnexo(${anexo.id})">📥 Descargar</button>
+                <button onclick="simularEnvio(${anexo.id})">📤 Enviar</button>
+                <button onclick="eliminarAnexo(${anexo.id})" style="color:red;">🗑️ Eliminar</button>
             </div>
-          `;
+        `;
 
-          lista.appendChild(div);
-        });
-      }
+        lista.appendChild(div); // Agregar el div a la lista
+    });
+}
 
-      function editarAnexo(id) {
-        const anexo = anexosGuardados.find(a => a.id === id);
-        if (!anexo) return;
+function editarAnexo(id) {
+    const anexo = anexosGuardados.find(a => a.id === id);
+    if (!anexo) return;
 
-        idEditar = id;
-        document.getElementById('tituloForm').innerText = "Editar Anexo";
-        mostrarFormNuevoAnexo();
-        document.getElementById('nombreAnexo').value = anexo.nombre;
-        document.getElementById('contenidoAnexo').value = anexo.contenido;
-      }
+    idEditar = id; // Establecer el ID del anexo que se está editando
+    mostrarFormNuevoAnexo(); // Mostrar el formulario para editar
+
+    // Actualizar título del formulario
+    document.getElementById('tituloForm').innerText = "Editar Anexo";
+
+    // Llenar el formulario con los datos del anexo existente
+    document.getElementById('nombreAnexo').value = anexo.nombre;
+    document.getElementById('contenidoAnexo').value = anexo.contenido;
+}
 
       function descargarAnexo(id) {
         const anexo = anexosGuardados.find(a => a.id === id);
@@ -1183,28 +1195,47 @@
         const contenedor = document.getElementById('contenidoBeneficiario');
         contenedor.innerHTML = `
           <h4>Verificación de Beneficiario</h4>
-          <label for="cedulaRuc">Ingrese RUC o Cédula:</label>
-          <input type="text" id="cedulaRuc" placeholder="Ej. 0102030405" maxlength="13"/>
+          <label for="cedulaRuc">Ingrese Cédula:</label>
+          <input type="text" id="cedulaRuc" placeholder="Ej. 0102030405" maxlength="10"/>
           <button onclick="verificarBeneficiario()">Verificar</button>
           <div id="resultadoBeneficiario" style="margin-top: 10px;"></div>
         `;
       }
 
-      function verificarBeneficiario() {
-        const input = document.getElementById('cedulaRuc').value.trim();
-        const resultado = document.getElementById('resultadoBeneficiario');
+      // Objeto para almacenar resultados de verificación
+const resultadosVerificacion = {};
 
-        if (!/^\d{10,13}$/.test(input)) {
-          resultado.innerHTML = `<p style="color: red;">❌ Ingrese un número válido de RUC o Cédula (10 o 13 dígitos).</p>`;
-          return;
-        }
+function verificarBeneficiario() {
+    const input = document.getElementById('cedulaRuc').value.trim();
+    const resultado = document.getElementById('resultadoBeneficiario');
 
-        const esBeneficiario = Math.random() < 0.5;
+    // Validar solo cédulas de 10 dígitos
+    if (!/^\d{10}$/.test(input)) {
+        resultado.innerHTML = `<p style="color: red;">❌ Ingrese un número válido de Cédula (10 dígitos).</p>`;
+        return;
+    }
 
-        resultado.innerHTML = esBeneficiario
-          ? `<p style="color: green;">✅ El número ingresado SÍ es beneficiario de pensión alimenticia.</p>`
-          : `<p style="color: orange;">❌ El número ingresado NO es beneficiario de pensión alimenticia.</p>`;
-      }
+    // Verificar si ya se ha consultado este número de cédula
+    if (resultadosVerificacion[input]) {
+        // Si ya existe un resultado, mostrarlo
+        resultado.innerHTML = resultadosVerificacion[input];
+        return;
+    }
+
+    // Simulación de verificación de beneficiario
+    const esBeneficiario = Math.random() < 0.5;
+    const mensaje = esBeneficiario
+        ? `<p style="color: green;">✅ El número ingresado SÍ es beneficiario de pensión alimenticia.</p>`
+        : `<p style="color: orange;">❌ El número ingresado NO es beneficiario de pensión alimenticia.</p>`;
+
+    // Almacenar el resultado en el objeto
+    resultadosVerificacion[input] = mensaje;
+
+    // Mostrar resultado
+    resultado.innerHTML = mensaje;
+}
+
+
 
 
         //FACTURACIÓN
@@ -1248,67 +1279,6 @@
         return `001-001-${aleatorio}`;
       }
 
-      // Simula generación de archivos .txt de autorización y factura
-      function generarFacturaFisica() {
-        const emisor = document.getElementById("emisor").value;
-        const rucEmisor = document.getElementById("rucEmisor").value;
-        const direccionEmisor = document.getElementById("direccionEmisor").value;
-
-        const cliente = document.getElementById("cliente").value;
-        const rucCliente = document.getElementById("rucCliente").value;
-
-        const detalle = document.getElementById("detalle").value;
-        const cantidad = parseInt(document.getElementById("cantidad").value);
-        const precio = parseFloat(document.getElementById("precio").value);
-
-        const subtotal = cantidad * precio;
-        const iva = subtotal * 0.12;
-        const total = subtotal + iva;
-        const fecha = new Date().toLocaleDateString();
-        const numeroFactura = generarNumeroFactura();
-        const numAutorizacion = Math.floor(Math.random() * 99999999999999999999).toString().padStart(19, "0");
-
-        // Contenido de la autorización
-        const contenidoAutorizacion = `
-      AUTORIZACIÓN SRI
-      -------------------------------
-      RUC: ${rucEmisor}
-      Número de autorización: ${numAutorizacion}
-      Factura No.: ${numeroFactura}
-      Fecha de autorización: ${fecha}
-      -------------------------------
-      Este archivo es válido como constancia de autorización
-      `;
-
-        // Contenido de la factura
-        const contenidoFactura = `
-      FACTURA FÍSICA SRI SIMULADA
-      ------------------------------------------------
-      Emisor: ${emisor}
-      RUC: ${rucEmisor}
-      Dirección: ${direccionEmisor}
-      Factura No.: ${numeroFactura}
-      Autorización SRI: ${numAutorizacion}
-      Fecha: ${fecha}
-
-      Cliente: ${cliente}
-      CI/RUC: ${rucCliente}
-
-      ------------------------------------------------
-      Detalle: ${detalle}
-      Cantidad: ${cantidad}
-      Precio Unitario: $${precio.toFixed(2)}
-      Subtotal: $${subtotal.toFixed(2)}
-      IVA 12%: $${iva.toFixed(2)}
-      Total: $${total.toFixed(2)}
-      ------------------------------------------------
-      "Este documento es válido para efectos tributarios"
-      `;
-
-        descargarTxt("autorizacion_sri.txt", contenidoAutorizacion);
-        descargarTxt("factura_fisica.txt", contenidoFactura);
-      }
-
       // Función para generar descarga de archivo .txt
       function descargarTxt(nombreArchivo, contenido) {
         const blob = new Blob([contenido], { type: "text/plain" });
@@ -1343,23 +1313,55 @@
 
       // Factura Física
       function generarFacturaFisica() {
-        const emisor = document.getElementById("emisor").value;
-        const rucEmisor = document.getElementById("rucEmisor").value;
-        const direccionEmisor = document.getElementById("direccionEmisor").value;
-        const cliente = document.getElementById("cliente").value;
-        const rucCliente = document.getElementById("rucCliente").value;
-        const detalle = document.getElementById("detalle").value;
-        const cantidad = parseInt(document.getElementById("cantidad").value);
-        const precio = parseFloat(document.getElementById("precio").value);
+    const emisor = document.getElementById("emisor").value.trim();
+    const rucEmisor = document.getElementById("rucEmisor").value.trim();
+    const direccionEmisor = document.getElementById("direccionEmisor").value.trim();
+    const cliente = document.getElementById("cliente").value.trim();
+    const rucCliente = document.getElementById("rucCliente").value.trim();
+    const detalle = document.getElementById("detalle").value.trim();
+    const cantidad = parseInt(document.getElementById("cantidad").value);
+    const precio = parseFloat(document.getElementById("precio").value);
 
-        const subtotal = cantidad * precio;
-        const iva = subtotal * 0.12;
-        const total = subtotal + iva;
-        const fecha = new Date().toLocaleDateString();
-        const numeroFactura = generarNumeroFactura();
-        const numAutorizacion = Math.floor(Math.random() * 99999999999999999999).toString().padStart(19, "0");
+    // Validaciones
+    if (!emisor || !rucEmisor || !direccionEmisor || !cliente || !rucCliente || !detalle || isNaN(cantidad) || isNaN(precio)) {
+        alert("Por favor, complete todos los campos requeridos.");
+        return;
+    }
 
-        const autorizacion = `
+    if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]+$/.test(cliente)) {
+        alert("El nombre del cliente solo debe contener letras y espacios.");
+        return;
+    }
+
+    if (!/^\d{13}$/.test(rucEmisor) || !rucEmisor.endsWith("001")) {
+        alert("El RUC del emisor debe tener 13 dígitos y terminar en 001.");
+        return;
+    }
+
+    if (!/^\d{13}$/.test(rucCliente) || !rucCliente.endsWith("001")) {
+        alert("El RUC del cliente debe tener 13 dígitos y terminar en 001.");
+        return;
+    }
+
+    if (!Number.isInteger(cantidad) || cantidad <= 0) {
+        alert("La cantidad debe ser un número positivo.");
+        return;
+    }
+
+    if (precio <= 0) {
+        alert("El precio debe ser un número positivo.");
+        return;
+    }
+
+    const subtotal = cantidad * precio;
+    const iva = subtotal * 0.12;
+    const total = subtotal + iva;
+    const fecha = new Date().toLocaleDateString();
+    const numeroFactura = generarNumeroFactura();
+    const numAutorizacion = Math.floor(Math.random() * 99999999999999999999).toString().padStart(19, "0");
+
+    // Contenido de la autorización
+    const contenidoAutorizacion = `
       AUTORIZACIÓN SRI
       -------------------------------
       RUC: ${rucEmisor}
@@ -1368,55 +1370,89 @@
       Fecha de autorización: ${fecha}
       -------------------------------
       Este archivo es válido como constancia de autorización
-      `;
+    `;
 
-        const factura = `
+    // Contenido de la factura
+    const contenidoFactura = `
       FACTURA FÍSICA SRI SIMULADA
-      -------------------------------
+      ------------------------------------------------
       Emisor: ${emisor}
       RUC: ${rucEmisor}
       Dirección: ${direccionEmisor}
       Factura No.: ${numeroFactura}
-      Autorización: ${numAutorizacion}
+      Autorización SRI: ${numAutorizacion}
       Fecha: ${fecha}
 
       Cliente: ${cliente}
       CI/RUC: ${rucCliente}
 
+      ------------------------------------------------
       Detalle: ${detalle}
       Cantidad: ${cantidad}
       Precio Unitario: $${precio.toFixed(2)}
       Subtotal: $${subtotal.toFixed(2)}
       IVA 12%: $${iva.toFixed(2)}
       Total: $${total.toFixed(2)}
-      -------------------------------
+      ------------------------------------------------
       "Este documento es válido para efectos tributarios"
-      `;
+    `;
 
-        descargarTxt("autorizacion_fisica.txt", autorizacion);
-        descargarTxt("factura_fisica.txt", factura);
-      }
+    descargarTxt("autorizacion_sri.txt", contenidoAutorizacion);
+    descargarTxt("factura_fisica.txt", contenidoFactura);
+}
+
 
       // Factura Electrónica
-      function generarFacturaElectronica() {
-        const emisor = document.getElementById("emisorE").value;
-        const rucEmisor = document.getElementById("rucEmisorE").value;
-        const direccionEmisor = document.getElementById("direccionEmisorE").value;
-        const cliente = document.getElementById("clienteE").value;
-        const rucCliente = document.getElementById("rucClienteE").value;
-        const detalle = document.getElementById("detalleE").value;
-        const cantidad = parseInt(document.getElementById("cantidadE").value);
-        const precio = parseFloat(document.getElementById("precioE").value);
+ function generarFacturaElectronica() {
+    const emisor = document.getElementById("emisorE").value.trim();
+    const rucEmisor = document.getElementById("rucEmisorE").value.trim();
+    const direccionEmisor = document.getElementById("direccionEmisorE").value.trim();
+    const cliente = document.getElementById("clienteE").value.trim();
+    const rucCliente = document.getElementById("rucClienteE").value.trim();
+    const detalle = document.getElementById("detalleE").value.trim();
+    const cantidad = parseInt(document.getElementById("cantidadE").value);
+    const precio = parseFloat(document.getElementById("precioE").value);
 
-        const subtotal = cantidad * precio;
-        const iva = subtotal * 0.12;
-        const total = subtotal + iva;
+    // Validaciones
+    if (!emisor || !rucEmisor || !direccionEmisor || !cliente || !rucCliente || !detalle || isNaN(cantidad) || isNaN(precio)) {
+        alert("Por favor, complete todos los campos requeridos.");
+        return;
+    }
 
-        const fecha = new Date().toISOString().split('T')[0];
-        const numeroFactura = generarNumeroFactura();
-        const claveAcceso = Math.floor(10000000000000000000000000000000000000 + Math.random() * 90000000000000000000000000000000000000).toString();
+    if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]+$/.test(cliente)) {
+        alert("El nombre del cliente solo debe contener letras y espacios.");
+        return;
+    }
 
-        const xml = `
+    if (!/^\d{13}$/.test(rucEmisor) || !rucEmisor.endsWith("001")) {
+        alert("El RUC del emisor debe tener 13 dígitos y terminar en 001.");
+        return;
+    }
+
+    if (!/^\d{13}$/.test(rucCliente) || !rucCliente.endsWith("001")) {
+        alert("El RUC del cliente debe tener 13 dígitos y terminar en 001.");
+        return;
+    }
+
+    if (!Number.isInteger(cantidad) || cantidad <= 0) {
+        alert("La cantidad debe ser un número positivo.");
+        return;
+    }
+
+    if (precio <= 0) {
+        alert("El precio debe ser un número positivo.");
+        return;
+    }
+
+    const subtotal = cantidad * precio;
+    const iva = subtotal * 0.12;
+    const total = subtotal + iva;
+
+    const fecha = new Date().toISOString().split('T')[0];
+    const numeroFactura = generarNumeroFactura();
+    const claveAcceso = Math.floor(10000000000000000000000000000000000000 + Math.random() * 90000000000000000000000000000000000000).toString();
+
+    const xml = `
       <factura id="comprobante" version="1.1.0">
         <infoTributaria>
           <razonSocial>${emisor}</razonSocial>
@@ -1453,9 +1489,9 @@
           </detalle>
         </detalles>
       </factura>
-      `;
+    `;
 
-        const autorizacion = `
+    const autorizacion = `
       AUTORIZACIÓN SRI - FACTURACIÓN ELECTRÓNICA
       --------------------------------------------
       RUC del Emisor: ${rucEmisor}
@@ -1466,11 +1502,12 @@
       Estado: AUTORIZADO
       --------------------------------------------
       Este documento sirve como constancia de autorización electrónica por el SRI
-      `;
+    `;
 
-        descargarTxt("autorizacion_electronica.txt", autorizacion);
-        descargarTxt("factura_electronica.xml", xml);
-      }
+    descargarTxt("autorizacion_electronica.txt", autorizacion);
+    descargarTxt("factura_electronica.xml", xml);
+}
+
 
 
 //=======================================  VEHICULO  ===============================================
@@ -1485,129 +1522,73 @@ const marcasModelos = {
 
 const datosGuardados = {};
 const pagosRealizados = {};
-const pagosConfirmados = new Set(); // Control para evitar pagos duplicados
+const pagosConfirmados = new Set();
 
-// Listas de nombres para generación aleatoria
+// Nombres aleatorios
 const nombresHombres = ["Juan", "Carlos", "Luis", "Miguel", "José", "Andrés"];
 const apellidosHombres = ["Pérez", "García", "Rodríguez", "López", "Martínez"];
 const nombresMujeres = ["María", "Luisa", "Ana", "Carla", "Sofía", "Elena"];
 const apellidosMujeres = ["Gómez", "Díaz", "Fernández", "Morales", "Castro"];
 
-// Variable global para guardar el último dato válido ingresado
 let ultimoDatoIngresado = '';
 
+// Funciones principales
 function mostrarConsultaVehiculo(tipo) {
-  const contenido = document.getElementById('contenidoVehiculo');
-  const seccionPagos = document.getElementById('seccionPagosRealizados');
-  seccionPagos.innerHTML = ''; // Limpiar pagos al mostrar consulta
+  const placeholder = tipo === 'placa' ? 
+    'Ingrese Placa, RAMV o CPN (Ej: ABC1234)' : 
+    'Ingrese Código de Chasis (17 caracteres)';
 
-  let placeholder = tipo === 'placa'
-    ? 'Ingrese Placa, RAMV o CPN (Ej: ABC1234)'
-    : 'Ingrese Código de Chasis (17 caracteres MAYÚSCULOS)';
-
-  contenido.innerHTML = `
-    <input type="text" id="inputDato" placeholder="${placeholder}" />
-    <button onclick="validarDato('${tipo}')">Validar</button>
-    <p id="mensaje" style="margin-top: 5px;"></p>
-    <div id="infoVehiculo" style="margin-top: 20px;"></div>
-    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-      <div id="infoPagoIzq" style="border: 1px solid #ccc; padding: 10px; border-radius: 6px; display: inline-block;"></div>
-      <div id="metodosPagoDer" style="border: 1px solid #ccc; padding: 10px; border-radius: 6px; display: inline-block;"></div>
+  document.getElementById('contenidoVehiculo').innerHTML = `
+    <input type="text" id="inputDato" placeholder="${placeholder}" class="input-text" />
+    <button onclick="validarDato('${tipo}')" class="btn-validar">Validar</button>
+    <p id="mensajeValidacion"></p>
+    <div id="infoVehiculo"></div>
+    <div class="pago-container">
+      <div id="infoPagoIzq" class="pago-card" style="float: left; width: 48%;"></div>
+      <div id="metodosPagoDer" class="pago-card" style="float: right; width: 48%;"></div>
     </div>
-    <div id="tablaReportes" style="margin-top: 30px; display: flex; justify-content: center;"></div>
+    <div style="clear: both;"></div>
+    <div id="tablaReportes"></div>
+    <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+      <button onclick="mostrarPagosRealizados()" class="btn-validar">Ver Reportes de Pago</button>
+    </div>
   `;
+
+  document.getElementById('seccionPagosRealizados').innerHTML = '';
 }
 
-function mostrarPagosRealizados() {
-  const seccionPagos = document.getElementById('seccionPagosRealizados');
-  const contenido = document.getElementById('contenidoVehiculo');
-
-  contenido.innerHTML = '';  // Ocultamos consulta
-  cerrarModal();
-  cerrarModalPagoTarjeta();
-
-  if (!ultimoDatoIngresado || !pagosRealizados[ultimoDatoIngresado] || pagosRealizados[ultimoDatoIngresado].length === 0) {
-    seccionPagos.innerHTML = '<p style="color: gray;">No existen pagos registrados para este dato.</p>';
-    return;
-  }
-
-  const pagos = pagosRealizados[ultimoDatoIngresado];
-  seccionPagos.innerHTML = ''; // Limpiar antes de agregar
-  pagos.forEach((pago, index) => {
-    let filas = '';
-    pago.datos.forEach(r => {
-      filas += `
-        <tr>
-          <td>${r.rubro}</td>
-          <td>${r.fecha}</td>
-          <td>$${r.valor}</td>
-        </tr>
-      `;
-    });
-
-    seccionPagos.innerHTML += `
-      <div style="margin-top: 20px; border: 1px solid #aaa; padding: 10px; border-radius: 6px; max-width: 850px;">
-        <h3>Pago realizado en ${pago.anio}</h3>
-        <table border="1" cellpadding="5" cellspacing="0" style="width: 100%; margin-bottom: 10px; text-align:center;">
-          <thead>
-            <tr>
-              <th>Rubro</th>
-              <th>Fecha</th>
-              <th>Valor</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${filas}
-            <tr>
-              <td colspan="2"><strong>Total</strong></td>
-              <td><strong>$${pago.total}</strong></td>
-            </tr>
-          </tbody>
-        </table>
-        <button style="float:right;" onclick="verDetalles(${index}, '${ultimoDatoIngresado}')">🔍 Ver detalles</button>
-      </div>
-    `;
-  });
-}
 
 function validarDato(tipo) {
   const input = document.getElementById('inputDato').value.trim().toUpperCase();
-  ultimoDatoIngresado = input; // Guardar el dato ingresado para uso posterior
+  ultimoDatoIngresado = input;
+  const mensaje = document.getElementById('mensajeValidacion');
 
-  const mensaje = document.getElementById('mensaje');
-  mensaje.className = '';
-
-  const regexPlaca = /^[A-Z]{3}[0-9]{3,4}$/; // 3 letras mayúsculas seguidas de 3-4 números
-  const regexChasis = /^[A-Z0-9]{17}$/; // 17 caracteres que pueden ser letras mayúsculas o números
+  const regexPlaca = /^[A-Z]{3}\d{3,4}$/;
+  const regexChasis = /^[A-Z0-9]{17}$/;
 
   if ((tipo === 'placa' && !regexPlaca.test(input)) || (tipo === 'chasis' && !regexChasis.test(input))) {
-    mensaje.textContent = tipo === 'placa'
-      ? 'Placa inválida. Formato: 3 letras MAYÚSCULAS y 3-4 números (Ej: ABC1234).'
-      : 'Código inválido. Debe tener 17 caracteres MAYÚSCULOS y números.';
-    mensaje.style.color = 'red';
-    return; // Termina la función si la placa es inválida
+    mensaje.textContent = tipo === 'placa' ?
+      '❌ Dato inválido. Formato: 3 letras y 3-4 números (Ej: ABC1234)' :
+      '❌ Código inválido. Debe tener 17 caracteres y números';
+    mensaje.className = 'mensaje-error';
+    return;
   }
 
-  mensaje.textContent = tipo === 'placa' ? 'Placa válida.' : 'Código de chasis válido.';
-  mensaje.style.color = 'green';
+  mensaje.textContent = tipo === 'placa' ? '✅ Placa válida' : '✅ Código de chasis válido';
 
-  if (datosGuardados[input]) {
-    renderizarDatos(datosGuardados[input], tipo, input);
-  } else {
-    const data = generarDatosAleatorios(tipo, input);
-    datosGuardados[input] = data;
-    renderizarDatos(data, tipo, input);
+  mensaje.className = 'mensaje-exito';
+
+  if (!datosGuardados[input]) {
+    datosGuardados[input] = generarDatosAleatorios(tipo, input);
   }
+  renderizarDatos(datosGuardados[input], tipo, input);
 }
-
 
 function generarDatosAleatorios(tipo, input) {
   const marcas = Object.keys(marcasModelos);
   const marca = marcas[Math.floor(Math.random() * marcas.length)];
   const modelo = marcasModelos[marca][Math.floor(Math.random() * 4)];
   const anio = Math.floor(Math.random() * (2024 - 2005 + 1)) + 2005;
-  const anioPago = new Date().getFullYear();
-
   const rubros = ['Multa', 'Impuesto', 'Revisión técnica', 'Parqueo indebido', 'Otros cargos'];
   const cantidad = Math.floor(Math.random() * 3) + 1;
 
@@ -1616,14 +1597,27 @@ function generarDatosAleatorios(tipo, input) {
     const rubro = rubros[Math.floor(Math.random() * rubros.length)];
     const valor = Math.floor(Math.random() * (184 - 34 + 1)) + 34;
     total += valor;
-    reportes.push({ rubro, fecha: generarFechaAleatoria(), valor });
+    reportes.push({ 
+      rubro, 
+      fecha: generarFechaAleatoria(), 
+      valor, 
+      pagado: false 
+    });
   }
 
-  return { marca, modelo, anio, anioPago, reportes, total, datoIngresado: input };
+  return { 
+    marca, 
+    modelo, 
+    anio, 
+    anioPago: new Date().getFullYear(), 
+    reportes, 
+    total, 
+    datoIngresado: input 
+  };
 }
 
 function renderizarDatos(data, tipo, input) {
-  document.getElementById('infoVehiculo').innerHTML = `
+  const infoVehiculoHTML = `
     <h3>Información del Vehículo</h3>
     <p><strong>${tipo === 'placa' ? 'Placa' : 'Chasis'}:</strong> ${input}</p>
     <p><strong>Marca:</strong> ${data.marca}</p>
@@ -1631,291 +1625,853 @@ function renderizarDatos(data, tipo, input) {
     <p><strong>Año:</strong> ${data.anio}</p>
   `;
 
-  document.getElementById('infoPagoIzq').innerHTML = `
+  const infoPagoHTML = `
     <strong style="color: blue;">ÚLTIMO PAGO</strong><br>
     Año: ${data.anioPago}
   `;
 
-  let filas = '';
-  data.reportes.forEach(r => {
-    filas += `
-      <tr>
-        <td>${r.rubro}</td>
-        <td>${r.fecha}</td>
-        <td>$${r.valor}</td>
-      </tr>
-    `;
-  });
+  let filas = data.reportes.map(r => `
+    <tr>
+      <td>${r.rubro}</td>
+      <td>${r.fecha}</td>
+      <td>$${r.valor}</td>
+      <td style="color: ${r.pagado ? 'green' : 'red'}">
+        ${r.pagado ? '✓ Pagado' : '✗ Pendiente'}
+      </td>
+    </tr>
+  `).join('');
 
+  const keyPago = `${input}_${data.anioPago}`;
+  const pagoYaRealizado = pagosConfirmados.has(keyPago);
+
+  const metodosPagoHTML = `
+    <h4>MÉTODOS DE PAGO</h4>
+    <p>Total: <strong>$${data.total}</strong></p>
+    <div class="botones-pago">
+      <button ${pagoYaRealizado ? 'disabled' : ''} onclick="abrirModalPagoTarjeta('${input}')">
+        Pagar con Tarjeta
+      </button>
+      <button ${pagoYaRealizado ? 'disabled' : ''} onclick="generarBoleto('${input}', '${data.total}')">
+        Generar Boleto
+      </button>
+    </div>
+    ${pagoYaRealizado ? '<p class="pago-realizado">Pago ya realizado</p>' : ''}
+  `;
+
+  document.getElementById('infoVehiculo').innerHTML = infoVehiculoHTML;
+  document.getElementById('infoPagoIzq').innerHTML = infoPagoHTML;
+  document.getElementById('metodosPagoDer').innerHTML = metodosPagoHTML;
   document.getElementById('tablaReportes').innerHTML = `
-    <h2 style="margin-top: 20px; text-align: center;">Reportes de pago del vehículo</h2>
-    <table border="1" cellpadding="8" cellspacing="0" style="width: 90%; max-width: 800px; text-align: center;">
+    <h2>Reportes de pago del vehículo</h2>
+    <table class="tabla-reportes">
       <thead>
         <tr>
           <th>Rubro</th>
           <th>Fecha</th>
           <th>Valor</th>
+          <th>Estado</th>
         </tr>
       </thead>
       <tbody>
         ${filas}
-        <tr>
-          <td colspan="2"><strong>Total a Cancelar</strong></td>
+        <tr class="total-row">
+          <td colspan="3"><strong>Total a Cancelar</strong></td>
           <td><strong>$${data.total}</strong></td>
         </tr>
       </tbody>
     </table>
   `;
-
-  // Solo habilitar botones si NO se ha pagado ya ese año con esa placa
-  const keyPago = `${data.datoIngresado}_${data.anioPago}`;
-  const pagoYaRealizado = pagosConfirmados.has(keyPago);
-
-  document.getElementById('metodosPagoDer').innerHTML = `
-    <h4 style="text-transform: uppercase;">MÉTODOS DE PAGO</h4>
-    <p style="text-transform: uppercase;">Total: <span style="font-weight: normal;">$${data.total}</span></p>
-    <div style="display: flex; gap: 10px;">
-      <button ${pagoYaRealizado ? 'disabled' : ''} onclick="abrirModalPagoTarjeta('${data.datoIngresado}')">Tarjeta</button>
-      <button ${pagoYaRealizado ? 'disabled' : ''} onclick="generarBoleto('${data.datoIngresado}', '${data.total}')">Boleto de Pago</button>
-    </div>
-    ${pagoYaRealizado ? '<p style="color: green; font-weight: bold;">Pago ya realizado para esta placa y año.</p>' : ''}
-  `;
-}
-
-function generarFechaAleatoria() {
-  const fechaActual = new Date();
-  const inicio = new Date(fechaActual.getFullYear(), 0, 1); // 1 de enero del año actual
-  const fin = fechaActual; // hoy
-  const diferencia = fin.getTime() - inicio.getTime();
-  const nuevaFecha = new Date(inicio.getTime() + Math.random() * diferencia);
-  return nuevaFecha.toISOString().split('T')[0]; // formato yyyy-mm-dd
-}
-
-function guardarDatos() {
-  const propietario = document.getElementById("propietario").value;
-  const marca = document.getElementById("marca").value;
-  const modelo = document.getElementById("modelo").value;
-
-  if (!propietario || !marca || !modelo) {
-    alert("Por favor complete todos los campos.");
-    return;
-  }
-
-  const reporte = {
-    propietario,
-    marca,
-    modelo,
-    fecha: generarFechaAleatoria() // fecha limitada al día actual
-  };
-
-  datosGuardados.push(reporte);
-  mostrarTabla();
-}
-
-
-function generarBoleto(placa, total) {
-  if (verificarPagoUnico(placa)) {
-    confirmarPago(placa, 'Boleto de Pago');
-    const contenido = `BOLETO DE PAGO\n\nDato: ${placa}\nTotal a pagar: $${total}\nCuenta: 1234567890\nBanco: Banco Institucional\nReferencia: ${Math.floor(Math.random() * 1000000000)}`;
-    const blob = new Blob([contenido], { type: 'text/plain' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `boleto_pago_${placa}.txt`;
-    link.click();
-  } else {
-    alert('El pago ya fue realizado para esta placa y año.');
-  }
-}
-
-// Valida si se puede pagar o ya fue pagado
-function verificarPagoUnico(placa) {
-  const pago = datosGuardados[placa];
-  if (!pago) return false;
-  const keyPago = `${placa}_${pago.anioPago}`;
-  return !pagosConfirmados.has(keyPago);
 }
 
 function abrirModalPagoTarjeta(placa) {
-  const pago = datosGuardados[placa];
-  if (!pago) return alert('Debe validar primero la placa.');
+    const pago = datosGuardados[placa];
+    if (!pago) {
+        mostrarAlerta('Debe validar primero la placa');
+        return;
+    }
 
-  if (!verificarPagoUnico(placa)) {
-    alert('Ya se ha realizado el pago para esta placa y reporte.');
-    return;
-  }
-
-  const modal = document.getElementById('modalPagoTarjeta');
-  modal.innerHTML = `
-    <h2>Pago con Tarjeta - Total: $${pago.total}</h2>
-    <label>
-      Número de tarjeta:<br/>
-      <input type="text" id="inputNumeroTarjeta" maxlength="16" placeholder="1234123412341234" />
-    </label><br/><br/>
-    <label>
-      Fecha de vencimiento (MM/YYYY):<br/>
-      <input type="text" id="inputFechaVencimiento" maxlength="7" placeholder="MM/YYYY" />
-    </label><br/><br/>
-    <label>
-      Código de seguridad:<br/>
-      <input type="password" id="inputCodigoSeguridad" maxlength="4" placeholder="123" />
-    </label><br/><br/>
-    <button onclick="procesarPagoTarjeta('${placa}')">Confirmar Pago</button>
-    <button onclick="cerrarModalPagoTarjeta()">Cancelar</button>
-  `;
-  modal.style.display = 'block';
+    const modal = document.getElementById('modalPagoTarjeta');
+    modal.innerHTML = `
+        <div class="modal-contenido">
+            <span class="cerrar-modal" onclick="cerrarModalPagoTarjeta()">&times;</span>
+            <h2>Pago con Tarjeta</h2>
+            <p class="total-pago">Total a pagar: $${pago.total}</p>
+            
+            <div class="form-group">
+                <label for="inputNumeroTarjeta">Número de Tarjeta</label>
+                <input type="text" id="inputNumeroTarjeta" placeholder="1234 5678 9012 3456" maxlength="16">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inputFechaVencimiento">Vencimiento (MM/AA)</label>
+                    <input type="text" id="inputFechaVencimiento" placeholder="MM/AA">
+                </div>
+                
+                <div class="form-group">
+                    <label for="inputCodigoSeguridad">CVV</label>
+                    <input type="password" id="inputCodigoSeguridad" placeholder="123" maxlength="3">
+                </div>
+            </div>
+            
+            <div class="botones-accion">
+                <button onclick="procesarPagoConTarjeta('${placa}')" class="btn-primario">Confirmar Pago</button>
+                <button onclick="cerrarModalPagoTarjeta()" class="btn-secundario">Cancelar</button>
+            </div>
+        </div>
+    `;
+    
+    modal.style.display = 'block';
 }
 
-function procesarPagoTarjeta(placa) {
-  const numeroTarjeta = document.getElementById('inputNumeroTarjeta').value.trim();
-  const fechaVenc = document.getElementById('inputFechaVencimiento').value.trim();
-  const codigoSeguridad = document.getElementById('inputCodigoSeguridad').value.trim();
+function procesarPagoConTarjeta(placa) {
+    const pago = datosGuardados[placa];
+    if (!verificarPagoUnico(placa)) {
+        mostrarAlerta('Ya se realizó el pago para esta placa');
+        return;
+    }
 
-  if (!/^\d{16}$/.test(numeroTarjeta)) {
-    alert('Número de tarjeta inválido. Debe tener 16 dígitos numéricos.');
-    return;
-  }
+    if (!pago) {
+        mostrarAlerta('No se encontró información del vehículo');
+        return false;
+    }
 
-  const fechaMatch = fechaVenc.match(/^(\d{2})\/(\d{4})$/);
-  if (!fechaMatch) {
-    alert('Fecha de vencimiento inválida. Debe tener formato MM/YYYY.');
-    return;
-  }
-  const mes = parseInt(fechaMatch[1], 10);
-  const año = parseInt(fechaMatch[2], 10);
-  const añoActual = new Date().getFullYear();
-  if (mes < 1 || mes > 12 || año < añoActual || año > 2027) {
-    alert('Fecha de vencimiento fuera de rango.');
-    return;
-  }
+    const numeroTarjeta = document.getElementById('inputNumeroTarjeta')?.value.replace(/\s/g, '') || '';
+    const fechaVenc = document.getElementById('inputFechaVencimiento')?.value || '';
+    const codigoSeguridad = document.getElementById('inputCodigoSeguridad')?.value || '';
 
-  if (!/^\d{3}$/.test(codigoSeguridad)) {
-    alert('Código de seguridad inválido. Debe tener 3 dígitos numéricos.');
-    return;
-  }
+    // Acumular mensajes de error
+    let mensajesError = [];
 
-  confirmarPago(placa, 'Tarjeta');
+    // Validaciones de campos
+    if (!/^\d{16}$/.test(numeroTarjeta)) {
+        mensajesError.push(`❌ Número de tarjeta inválido\nSe ingresó: ${numeroTarjeta}\nDebe tener exactamente 16 dígitos.`);
+    } else if (!/^\d+$/.test(numeroTarjeta)) {
+        mensajesError.push(`❌ Número de tarjeta inválido\nSe ingresó: ${numeroTarjeta}\nSolo se permiten dígitos.`);
+    }
 
-  alert('Pago realizado exitosamente.');
+    const fechaMatch = fechaVenc.match(/^(\d{2})\/(\d{2})$/);
+    if (!fechaMatch) {
+        mensajesError.push(`❌ Formato de fecha inválido\nSe ingresó: ${fechaVenc}\nUse el formato MM/AA.`);
+    } else {
+        const [mes, año] = fechaMatch.slice(1).map(Number);
+        const hoy = new Date();
+        const añoActual = hoy.getFullYear() % 100;
+        const mesActual = hoy.getMonth() + 1;
 
-  cerrarModalPagoTarjeta();
-  mostrarPagosRealizados();
+        if (mes < 1 || mes > 12) {
+            mensajesError.push(`❌ Mes de vencimiento inválido\nSe ingresó: ${mes}\nDebe estar entre 01 y 12.`);
+        }
+        if (año < añoActual || (año === añoActual && mes < mesActual)) {
+            mensajesError.push(`❌ La tarjeta está vencida\nFecha ingresada: ${fechaVenc}\nVerifique la fecha de vencimiento.`);
+        }
+    }
+
+    if (!/^\d{3}$/.test(codigoSeguridad)) {
+        mensajesError.push(`❌ Código de seguridad inválido\nSe ingresó: ${codigoSeguridad}\nDebe tener exactamente 3 dígitos.`);
+    } else if (!/^\d+$/.test(codigoSeguridad)) {
+        mensajesError.push(`❌ Código de seguridad inválido\nSe ingresó: ${codigoSeguridad}\nSolo se permiten dígitos.`);
+    }
+
+    // Si hay errores, mostrar todos juntos
+    if (mensajesError.length > 0) {
+        alert('ERRORES EN EL FORMULARIO:\n\n' + mensajesError.join('\n\n')); // Unir mensajes con salto de línea
+        return false;
+    }
+
+    // Procesar pago (simulado)
+    mostrarAlerta('Procesando pago...', 'info');
+    
+    setTimeout(() => {
+        // Solo si llegamos aquí, todas las validaciones pasaron
+        try {
+            // Confirmar el pago y actualizar el estado del reporte
+            confirmarPago(placa, 'Tarjeta');
+            
+            // Mostrar mensaje de éxito
+            mostrarAlerta('¡Pago exitoso!', 'success');
+
+            // Generar comprobante opcional
+            if (confirm('¿Desea descargar el comprobante?')) {
+                generarBoletoPagoTarjeta(placa, pago.total);
+            }
+            
+            cerrarModalPagoTarjeta();
+            // Actualizar vista
+            renderizarDatos(pago, 'placa', placa);
+        } catch (error) {
+            console.error('Error al procesar pago:', error);
+            mostrarAlerta('Error al procesar el pago', 'error');
+        }
+    }, 500);
+
+    return true;
+}
+
+
+
+function confirmarPago(placa, metodo = 'Tarjeta') {
+    const pago = datosGuardados[placa];
+    if (!pago) {
+        mostrarAlerta('No se encontró información del vehículo', 'error');
+        return false;
+    }
+    
+    const keyPago = `${placa}_${pago.anioPago}`;
+    if (pagosConfirmados.has(keyPago)) {
+        mostrarAlerta('Este vehículo ya tiene un pago registrado', 'warning');
+        return false;
+    }
+    
+    pagosConfirmados.add(keyPago);
+    
+    // Generar datos del contribuyente
+    const esHombre = Math.random() < 0.5;
+    const nombres = esHombre ? nombresHombres : nombresMujeres;
+    const apellidos = esHombre ? apellidosHombres : apellidosMujeres;
+    const nombreCompleto = `${nombres[Math.floor(Math.random() * nombres.length)]} ${apellidos[Math.floor(Math.random() * apellidos.length)]}`;
+    
+    // Marcar reportes como pagados
+    const fechaPago = new Date().toLocaleDateString();
+    pago.reportes.forEach(reporte => {
+        reporte.pagado = true;
+        reporte.fechaPago = fechaPago;
+    });
+    
+    // Registrar pago
+    if (!pagosRealizados[placa]) pagosRealizados[placa] = [];
+    pagosRealizados[placa].push({
+        anio: pago.anioPago,
+        datos: pago.reportes,
+        total: pago.total,
+        metodoPago: metodo,
+        nombreCompleto: nombreCompleto,
+        cedula: generarCedulaAleatoria(),
+        datoIngresado: placa,
+        fechaPago: fechaPago,
+        idTransaccion: Date.now() // Generar un ID único basado en la fecha
+    });
+    
+    // Actualizar UI
+    renderizarDatos(pago, 'placa', placa);
+    mostrarAlerta('¡Pago realizado con éxito!', 'success'); // Notificación de éxito
+    return true;
+}
+
+// Nueva función para generar el boleto al pagar con tarjeta
+function generarBoletoPagoTarjeta(placa, total) {
+    const contenido = `BOLETO DE PAGO TARJETA\n\nPlaca: ${placa}\nFecha: ${new Date().toLocaleDateString()}\nTotal: $${total}\nCod. Barras: ${Math.random().toString(36).substr(2, 20).toUpperCase()}\nVencimiento: ${new Date(Date.now() + 86400000 * 5).toLocaleDateString()}`;
+    
+    // Crear link de descarga (simulado)
+    const enlace = document.createElement('a');
+    enlace.href = URL.createObjectURL(new Blob([contenido], { type: 'text/plain' }));
+    enlace.download = `BoletoPagoTarjeta_${placa}.txt`;
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
 }
 
 function cerrarModalPagoTarjeta() {
-  const modal = document.getElementById('modalPagoTarjeta');
-  modal.style.display = 'none';
+    document.getElementById('modalPagoTarjeta').style.display = 'none';
 }
 
-function confirmarPago(placa, metodo = 'Tarjeta') {
-  const pago = datosGuardados[placa];
-  if (!pago) return;
+function mostrarAlerta(mensaje, tipo = 'error') {
+    const alerta = document.createElement('div');
+    alerta.className = `alerta alerta-${tipo}`;
+    alerta.textContent = mensaje;
+    
+    document.body.appendChild(alerta);
+    
+    setTimeout(() => {
+        alerta.classList.add('alerta-salir');
+        setTimeout(() => document.body.removeChild(alerta), 300);
+    }, 3000);
+}
 
-  const keyPago = `${placa}_${pago.anioPago}`;
-  if (pagosConfirmados.has(keyPago)) {
-    alert('Ya se ha realizado el pago para esta placa y reporte.');
-    return;
-  }
-
-  // Generar datos aleatorios persona (hombre o mujer al azar)
-  const esHombre = Math.random() < 0.5;
-  let nombre, apellido;
-  if (esHombre) {
-    nombre = nombresHombres[Math.floor(Math.random() * nombresHombres.length)];
-    apellido = apellidosHombres[Math.floor(Math.random() * apellidosHombres.length)];
-  } else {
-    nombre = nombresMujeres[Math.floor(Math.random() * nombresMujeres.length)];
-    apellido = apellidosMujeres[Math.floor(Math.random() * apellidosMujeres.length)];
-  }
-
-  // Generar cédula aleatoria (ecuador, 10 dígitos)
-  const cedula = generarCedulaAleatoria();
-
-  pagosConfirmados.add(keyPago);
-
-  if (!pagosRealizados[placa]) pagosRealizados[placa] = [];
-
-  pagosRealizados[placa].push({
-    anio: pago.anioPago,
-    datos: pago.reportes,
-    total: pago.total,
-    metodoPago: metodo,
-    nombreCompleto: `${nombre} ${apellido}`,
-    cedula,
-    datoIngresado: placa
-  });
-
-  // Actualizar interfaz para deshabilitar botones después del pago
-  renderizarDatos(pago, 'placa', placa);
+function generarFechaAleatoria() {
+    const fecha = new Date();
+    fecha.setMonth(fecha.getMonth() - Math.floor(Math.random() * 12));
+    return fecha.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).replace(/\//g, '-');
 }
 
 function generarCedulaAleatoria() {
-  const provincia = String(Math.floor(Math.random() * 24) + 1).padStart(2, '0'); // 01 a 24
-  const tercerDigito = Math.floor(Math.random() * 6); // 0 a 5 (persona natural)
-  const coeficientes = [2, 1, 2, 1, 2, 1, 2, 1, 2];
-  let cedulaSinVerificador = provincia + tercerDigito;
-
-  // Generar los siguientes 6 dígitos aleatorios (total 9 sin el verificador)
-  for (let i = 0; i < 6; i++) {
-    cedulaSinVerificador += Math.floor(Math.random() * 10).toString();
-  }
-
-  // Calcular dígito verificador
-  let suma = 0;
-  for (let i = 0; i < 9; i++) {
-    let valor = parseInt(cedulaSinVerificador[i]) * coeficientes[i];
-    if (valor >= 10) valor -= 9;
-    suma += valor;
-  }
-
-  const residuo = suma % 10;
-  const digitoVerificador = residuo === 0 ? 0 : 10 - residuo;
-
-  return cedulaSinVerificador + digitoVerificador;
+    const provincia = String(Math.floor(Math.random() * 24) + 1).padStart(2, '0');
+    const tercerDigito = Math.floor(Math.random() * 6);
+    const digitos = [provincia, tercerDigito];
+    
+    for (let i = 0; i < 6; i++) {
+        digitos.push(Math.floor(Math.random() * 10));
+    }
+    
+    // Calcular dígito verificador
+    const coeficientes = [2, 1, 2, 1, 2, 1, 2, 1, 2];
+    let suma = 0;
+    
+    for (let i = 0; i < 9; i++) {
+        let valor = digitos[i] * coeficientes[i];
+        suma += (valor > 9) ? valor - 9 : valor;
+    }
+    
+    const verificador = (suma % 10 === 0) ? 0 : 10 - (suma % 10);
+    digitos.push(verificador);
+    
+    return digitos.join('');
 }
 
+function generarBoleto(placa, total) {
+    if (!verificarPagoUnico(placa)) {
+        mostrarAlerta('Ya se realizó el pago para esta placa');
+        return;
+    }
 
-function verDetalles(index, placa) {
-  const pago = pagosRealizados[placa][index];
-  const modal = document.getElementById('modalDetallesPago');
+    confirmarPago(placa, 'Boleto Bancario');
+    mostrarAlerta('Boleto generado con éxito', 'success');
+    
+    const contenido = `BOLETO DE PAGO\n\nPlaca: ${placa}\nFecha: ${new Date().toLocaleDateString()}\nTotal: $${total}\nCod. Barras: ${Math.random().toString(36).substr(2, 20).toUpperCase()}\nVencimiento: ${new Date(Date.now() + 86400000 * 5).toLocaleDateString()}`;
+    
+    // Crear link de descarga (simulado)
+    const enlace = document.createElement('a');
+    enlace.href = URL.createObjectURL(new Blob([contenido], { type: 'text/plain' }));
+    enlace.download = `BoletoPago_${placa}.txt`;
+    enlace.click();
+}
 
-  let filasDetalle = '';
-  pago.datos.forEach(r => {
-    filasDetalle += `
-      <tr>
-        <td>${r.rubro}</td>
-        <td>${r.fecha}</td>
-        <td>$${r.valor}</td>
-      </tr>
+function verificarPagoUnico(placa) {
+    const pago = datosGuardados[placa];
+    if (!pago) return false;
+    return !pagosConfirmados.has(`${placa}_${pago.anioPago}`);
+}
+
+function mostrarPagosRealizados() {
+    const seccionPagos = document.getElementById('seccionPagosRealizados');
+    const contenidoPrincipal = document.getElementById('contenidoVehiculo');
+    
+    // Ocultar la sección de consulta
+    contenidoPrincipal.style.display = 'none';
+    
+    // Mostrar y preparar la sección de pagos realizados
+    seccionPagos.style.display = 'block';
+    seccionPagos.innerHTML = '';
+    
+    if (!ultimoDatoIngresado || !pagosRealizados[ultimoDatoIngresado]) {
+        seccionPagos.innerHTML = `
+            <div class="sin-pagos">
+                <h2>Reportes de Pago</h2>
+                <p>No existen pagos registrados para este vehículo</p>
+            </div>
+        `;
+        return;
+    }
+
+    const pagos = pagosRealizados[ultimoDatoIngresado];
+    
+    // Crear encabezado con botón para volver
+    const encabezado = document.createElement('div');
+    encabezado.className = 'encabezado-reportes';
+    encabezado.innerHTML = `
+        <h2>Reportes de Pago - Placa: ${ultimoDatoIngresado}</h2>
     `;
-  });
-
-  modal.innerHTML = `
-    <h2>Detalles del pago (${pago.anio})</h2>
-    <p><strong>Nombre:</strong> ${pago.nombreCompleto}</p>
-    <p><strong>Cédula:</strong> ${pago.cedula}</p>
-    <p><strong>Dato ingresado:</strong> ${pago.datoIngresado}</p>
-    <p><strong>Método de pago:</strong> ${pago.metodoPago}</p>
-    <table border="1" cellpadding="6" cellspacing="0" style="width: 100%; text-align:center; margin-top: 10px;">
-      <thead>
-        <tr><th>Rubro</th><th>Fecha</th><th>Valor</th></tr>
-      </thead>
-      <tbody>
-        ${filasDetalle}
-        <tr>
-          <td colspan="2"><strong>Total</strong></td>
-          <td><strong>$${pago.total}</strong></td>
-        </tr>
-      </tbody>
-    </table>
-    <button onclick="cerrarModal()" style="margin-top: 15px;">Cerrar</button>
-  `;
-  modal.style.display = 'block';
+    seccionPagos.appendChild(encabezado);
+    
+    // Crear contenedor para los reportes
+    const contenedorReportes = document.createElement('div');
+    contenedorReportes.className = 'lista-reportes';
+    
+    // Ordenar los pagos por fecha (más recientes primero)
+    pagos.sort((a, b) => new Date(b.fechaPago) - new Date(a.fechaPago));
+    
+    // Generar los elementos de cada pago
+    pagos.forEach((pago, index) => {
+        const rubrosPagados = pago.datos.filter(r => r.pagado).length;
+        const porcentajePagado = Math.round((rubrosPagados / pago.datos.length) * 100);
+        
+        const reporteElement = document.createElement('div');
+        reporteElement.className = 'item-reporte';
+        reporteElement.innerHTML = `
+            <div class="info-reporte">
+                <div class="encabezado-reporte">
+                    <span class="numero-transaccion">Transacción #${pago.idTransaccion}</span>
+                    <span class="fecha-pago">${pago.fechaPago}</span>
+                </div>
+                
+                <div class="detalles-reporte">
+                    <div class="info-columna">
+                        <span class="etiqueta">Método de pago</span>
+                        <span class="valor metodo-pago">
+                            <i class="fas ${pago.metodoPago === 'Tarjeta' ? 'fa-credit-card' : 'fa-file-invoice-dollar'}"></i>
+                            ${pago.metodoPago}
+                        </span>
+                    </div>
+                    
+                    <div class="info-columna">
+                        <span class="etiqueta">Rubros pagados</span>
+                        <div class="barra-progreso">
+                            <div class="progreso" style="width: ${porcentajePagado}%"></div>
+                            <span class="texto-progreso">${rubrosPagados}/${pago.datos.length} (${porcentajePagado}%)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-columna total">
+                        <span class="etiqueta">Total pagado</span>
+                        <span class="valor monto">$${pago.total.toFixed(2)}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="acciones-reporte">
+                <button onclick="verDetallesPago('${ultimoDatoIngresado}', ${index})" class="btn-detalles">
+                    Ver Detalles
+                </button>
+            </div>
+        `;
+        
+        contenedorReportes.appendChild(reporteElement);
+    });
+    
+    seccionPagos.appendChild(contenedorReportes);
+    
+    // Agregar estilos dinámicamente
+    const estilo = document.createElement('style');
+    estilo.textContent = `
+        .sin-pagos {
+            text-align: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .sin-pagos h2 {
+            color: #6c757d;
+        }
+        
+        .btn-volver {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        
+        .btn-volver:hover {
+            background: #5a6268;
+        }
+        
+        .encabezado-reportes {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .lista-reportes {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .item-reporte {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .info-reporte {
+            flex: 1;
+        }
+        
+        .encabezado-reporte {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .numero-transaccion {
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .fecha-pago {
+            color: #6c757d;
+        }
+        
+        .detalles-reporte {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .info-columna {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .etiqueta {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        
+        .valor {
+            font-size: 1rem;
+        }
+        
+        .metodo-pago {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #007bff;
+        }
+        
+        .barra-progreso {
+            width: 150px;
+            height: 24px;
+            background: #e9ecef;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progreso {
+            height: 100%;
+            background: #17a2b8;
+        }
+        
+        .texto-progreso {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: white;
+        }
+        
+        .total .valor {
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .acciones-reporte {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .btn-detalles {
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-detalles:hover {
+            background: #138496;
+        }
+    `;
+    document.head.appendChild(estilo);
 }
 
-function cerrarModal() {
-  const modal = document.getElementById('modalDetallesPago');
-  modal.style.display = 'none';
+function volverAConsulta() {
+    const seccionPagos = document.getElementById('seccionPagosRealizados');
+    const contenidoPrincipal = document.getElementById('contenidoVehiculo');
+    
+    seccionPagos.style.display = 'none';
+    contenidoPrincipal.style.display = 'block';
 }
+
+
+function verDetallesPago(placa, index) {
+    const pago = pagosRealizados[placa][index];
+    const modal = document.createElement('div');
+    modal.className = 'modal-detalles';
+    modal.innerHTML = `
+        <div class="modal-contenido">
+            <div class="modal-header">
+                <h2>Detalles del Pago</h2>
+                <span class="cerrar-modal" onclick="document.body.removeChild(this.parentNode.parentNode)">&times;</span>
+            </div>
+            
+            <div class="modal-body">
+                <div class="resumen-pago">
+                    <div class="resumen-item">
+                        <span class="resumen-etiqueta">Placa:</span>
+                        <span class="resumen-valor">${placa}</span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-etiqueta">Fecha de Pago:</span>
+                        <span class="resumen-valor">${pago.fechaPago}</span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-etiqueta">Método:</span>
+                        <span class="resumen-valor metodo-pago">
+                            <i class="fas ${pago.metodoPago === 'Tarjeta' ? 'fa-credit-card' : 'fa-file-invoice-dollar'}"></i>
+                            ${pago.metodoPago}
+                        </span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-etiqueta">Total:</span>
+                        <span class="resumen-valor total">$${pago.total.toFixed(2)}</span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-etiqueta">ID Transacción:</span>
+                        <span class="resumen-valor">${pago.idTransaccion}</span>
+                    </div>
+                </div>
+                
+                <h3>Rubros Pagados</h3>
+                <table class="tabla-detalles">
+                    <thead>
+                        <tr>
+                            <th>Concepto</th>
+                            <th>Fecha</th>
+                            <th>Valor</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${pago.datos.map(r => `
+                            <tr>
+                                <td>${r.rubro}</td>
+                                <td>${r.fecha}</td>
+                                <td>$${r.valor}</td>
+                                <td class="${r.pagado ? 'pagado' : 'pendiente'}">
+                                    ${r.pagado ? 'Pagado' : 'Pendiente'}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="modal-footer">
+                <button onclick="generarComprobante('${placa}', ${index})" class="btn-generar">
+                    <i class="fas fa-file-pdf"></i> Generar Comprobante
+                </button>
+                <button onclick="document.body.removeChild(this.parentNode.parentNode.parentNode)" class="btn-cerrar">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Estilos para el modal
+    const estiloModal = document.createElement('style');
+    estiloModal.textContent = `
+        .modal-detalles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-contenido {
+            background: white;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            padding: 1rem;
+            background: #343a40;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .cerrar-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .cerrar-modal:hover {
+            color: #ddd;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .resumen-pago {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .resumen-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .resumen-etiqueta {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        
+        .resumen-valor {
+            font-weight: 500;
+        }
+        
+        .total {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .metodo-pago {
+            color: #007bff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tabla-detalles {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .tabla-detalles th {
+            background: #343a40;
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        
+        .tabla-detalles td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .pagado {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .pendiente {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .modal-footer {
+            padding: 1rem;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+        
+        .btn-generar, .btn-cerrar {
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-generar {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-generar:hover {
+            background: #c82333;
+        }
+        
+        .btn-cerrar {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-cerrar:hover {
+            background: #5a6268;
+        }
+    `;
+    document.head.appendChild(estiloModal);
+    
+    document.body.appendChild(modal);
+}
+
+function generarComprobante(placa, index) {
+    const pago = pagosRealizados[placa][index];
+    
+    // Crear contenido del comprobante
+    let contenido = `
+        COMPROBANTE DE PAGO\n\n
+        Fecha: ${new Date().toLocaleDateString()}\n
+        ID Transacción: ${pago.idTransaccion}\n
+        Placa: ${placa}\n
+        Método de Pago: ${pago.metodoPago}\n
+        Total Pagado: $${pago.total.toFixed(2)}\n\n
+        Rubros:\n
+    `;
+    
+    pago.datos.forEach(r => {
+        contenido += `- ${r.rubro}: $${r.valor} (${r.pagado ? 'Pagado' : 'Pendiente'})\n`;
+    });
+    
+    // Crear enlace de descarga
+    const enlace = document.createElement('a');
+    enlace.href = URL.createObjectURL(new Blob([contenido], { type: 'text/plain' }));
+    enlace.download = `Comprobante_${placa}_${pago.idTransaccion}.txt`;
+    enlace.click();
+    
+    mostrarAlerta('Comprobante generado con éxito', 'success');
+}
+
+// Función auxiliar para formatear fechas (si no existe)
+function formatearFecha(fechaString) {
+    if (!fechaString) return '';
+    
+    const opciones = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    return new Date(fechaString).toLocaleDateString('es-ES', opciones);
+}
+
+// Nueva función para generar números de tarjeta aleatorios (solo para simulación)
+function generarNumeroTarjeta() {
+    let num = '';
+    for (let i = 0; i < 16; i++) {
+        if (i > 0 && i % 4 === 0) num += ' ';
+        num += Math.floor(Math.random() * 10);
+    }
+    return num;
+}
+
 
 
 
@@ -2024,30 +2580,18 @@ function cerrarModal() {
         }
 
 
+
       //===========================================================================================================================================0
       //=============================================================================== DEUDAS =================================================0
       //===========================================================================================================================================0
 
-   // Registro de resultados por cédula// Registro de resultados por cédula
 const registroDeudasPorCedula = {};
 let deudasUsuario = [];
 
-// Validación real de cédula ecuatoriana (versión oficial)
+// Validación simple de cédula ecuatoriana
 function validarCedula(cedula) {
-  if (!/^\d{10}$/.test(cedula)) return false;
-  const digitos = cedula.split('').map(Number);
-  const provincia = parseInt(cedula.substring(0, 2));
-  if (provincia < 1 || provincia > 24) return false;
-
-  let suma = 0;
-  for (let i = 0; i < 9; i++) {
-    let mult = digitos[i] * (i % 2 === 0 ? 2 : 1);
-    if (mult > 9) mult -= 9;
-    suma += mult;
-  }
-
-  const verificador = (10 - (suma % 10)) % 10;
-  return verificador === digitos[9];
+  // Verificar que la cédula tenga exactamente 10 dígitos
+  return /^\d{10}$/.test(cedula);
 }
 
 // --- FUNCIONES PARA CONSULTA DE DEUDAS ---
@@ -2055,7 +2599,7 @@ function validarCedula(cedula) {
 function mostrarConsultaDeudas() {
   document.getElementById("contenidoDeudas").innerHTML = `
     <h3>Consulta de Deudas</h3>
-    <label>Cédula/RUC:</label>
+    <label>Cédula:</label>
     <input type="text" id="cedulaConsulta" placeholder="Ej: 0102030405">
     <button onclick="validarConsultaDeudas()">Consultar</button>
     <div id="resultadoConsulta" style="margin-top: 10px;"></div>
@@ -2064,7 +2608,46 @@ function mostrarConsultaDeudas() {
   document.getElementById("btnFacilidadesPago").disabled = true;
 }
 
-// Genera deudas aleatorias con probabilidad escalonada para 1-2 o 3 deudas
+function validarConsultaDeudas() {
+  const cedula = document.getElementById("cedulaConsulta").value.trim();
+  const resultadoDiv = document.getElementById("resultadoConsulta");
+
+  // Validar cédula
+  if (!validarCedula(cedula)) {
+    alert("Cédula inválida. Ingrese una cédula ecuatoriana válida (10 dígitos).");
+    return;
+  }
+
+  // Consultar deudas
+  if (registroDeudasPorCedula.hasOwnProperty(cedula)) {
+    deudasUsuario = registroDeudasPorCedula[cedula];
+  } else {
+    const tieneDeuda = Math.random() < 0.6;
+    deudasUsuario = tieneDeuda ? generarDeudasAleatorias() : [];
+    registroDeudasPorCedula[cedula] = deudasUsuario;
+  }
+
+  // Mostrar resultados
+  if (deudasUsuario.length === 0 || deudasUsuario.every(d => d.monto <= 0)) {
+    resultadoDiv.innerHTML = `<p style="color:green;">No tiene deudas registradas para la cédula ${cedula}.</p>`;
+    document.getElementById("btnPagarDeudas").disabled = true;
+    document.getElementById("btnFacilidadesPago").disabled = true;
+    return;
+  }
+
+  let html = `<p style="color:red;">Se encontraron ${deudasUsuario.length} deudas para la cédula ${cedula}:</p><ul>`;
+  deudasUsuario.forEach(d => {
+    html += `<li><strong>${d.descripcion}</strong> - $${d.monto.toFixed(2)} (ID: ${d.id})</li>`;
+  });
+  html += "</ul>";
+
+  resultadoDiv.innerHTML = html;
+  document.getElementById("btnPagarDeudas").disabled = false;
+  document.getElementById("btnFacilidadesPago").disabled = false;
+}
+
+// --- FUNCIONES PARA GENERAR DEUDAS ALEATORIAS ---
+
 function generarDeudasAleatorias() {
   const opcionesDeudas = [
     { id: "D001", descripcion: "Impuesto Renta 2024", montoMin: 200, montoMax: 800 },
@@ -2079,7 +2662,6 @@ function generarDeudasAleatorias() {
     { id: "D010", descripcion: "Pago internet domiciliario", montoMin: 40, montoMax: 120 }
   ];
 
-  // Mayor probabilidad para 1 o 2 deudas, menos para 3
   const cantidad = Math.random() < 0.65 ? Math.floor(Math.random() * 2) + 1 : 3;
   const copia = [...opcionesDeudas];
   const seleccionadas = [];
@@ -2099,43 +2681,7 @@ function generarDeudasAleatorias() {
   return seleccionadas;
 }
 
-function validarConsultaDeudas() {
-  const cedula = document.getElementById("cedulaConsulta").value.trim();
-  const resultadoDiv = document.getElementById("resultadoConsulta");
-
-  if (!validarCedula(cedula)) {
-    alert("Cédula inválida. Ingrese una cédula ecuatoriana válida.");
-    return;
-  }
-
-  if (registroDeudasPorCedula.hasOwnProperty(cedula)) {
-    deudasUsuario = registroDeudasPorCedula[cedula];
-  } else {
-    const tieneDeuda = Math.random() < 0.6;
-    deudasUsuario = tieneDeuda ? generarDeudasAleatorias() : [];
-    registroDeudasPorCedula[cedula] = deudasUsuario;
-  }
-
-  if (deudasUsuario.length === 0) {
-    resultadoDiv.innerHTML = `<p style="color:green;">No tiene deudas registradas para el RUC/Cédula ${cedula}.</p>`;
-    document.getElementById("btnPagarDeudas").disabled = true;
-    document.getElementById("btnFacilidadesPago").disabled = true;
-    return;
-  }
-
-  let html = `<p style="color:red;">Se encontraron ${deudasUsuario.length} deudas para el RUC/Cédula ${cedula}:</p><ul>`;
-  deudasUsuario.forEach(d => {
-    html += `<li><strong>${d.descripcion}</strong> - $${d.monto.toFixed(2)} (ID: ${d.id})</li>`;
-  });
-  html += "</ul>";
-
-  resultadoDiv.innerHTML = html;
-  document.getElementById("btnPagarDeudas").disabled = false;
-  document.getElementById("btnFacilidadesPago").disabled = false;
-}
-
 // --- FUNCIONES PARA PAGAR DEUDAS ---
-
 function mostrarPagoDeudas() {
   if (deudasUsuario.length === 0) {
     alert("No hay deudas registradas para pagar.");
@@ -2148,28 +2694,174 @@ function mostrarPagoDeudas() {
     <select id="selectDeudaPago">
       ${deudasUsuario.map(d => `<option value="${d.id}">${d.descripcion} - $${d.monto.toFixed(2)}</option>`).join('')}
     </select>
-    <label>Monto a pagar:</label>
-    <input type="number" id="montoPago" min="0.01" step="0.01" placeholder="Ej: 100.00" value="${deudasUsuario[0].monto.toFixed(2)}">
-    <button onclick="validarPagoDeudas()">Pagar</button>
+
+    <div style="margin-top:10px;">
+      <button onclick="mostrarFormularioTarjeta()">Pago con Tarjeta</button>
+      <button onclick="generarBoletinPagoEfectivo()">Pago en Efectivo</button>
+    </div>
+
     <div id="mensajePago" style="margin-top:10px;"></div>
   `;
 
   document.getElementById("contenidoDeudas").innerHTML = contenido;
-
-  document.getElementById("selectDeudaPago").addEventListener('change', function () {
-    const selectedId = this.value;
-    const deuda = deudasUsuario.find(d => d.id === selectedId);
-    if (deuda) {
-      document.getElementById("montoPago").value = deuda.monto.toFixed(2);
-    }
-  });
 }
 
-function validarPagoDeudas() {
+function mostrarFormularioTarjeta() {
+  const deudaSelect = document.getElementById("selectDeudaPago");
+  const deudaSeleccionada = deudaSelect.options[deudaSelect.selectedIndex].text;
+  const deudaId = deudaSelect.value;
+  const deuda = deudasUsuario.find(d => d.id === deudaId);
+
+  const html = `
+    <div id="modalTarjeta" style="display:block; background-color:white; padding:20px; border:1px solid #ccc; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:1000;">
+      <h4>Datos de Tarjeta</h4>
+      <label>Número de Tarjeta (16 dígitos):</label>
+      <input type="text" id="numeroTarjeta" maxlength="16" placeholder="Ej: 1234567812345678"><br>
+
+      <label>Fecha de Vencimiento (MM/AA):</label>
+      <input type="text" id="fechaVencimiento" placeholder="Ej: 12/27"><br>
+
+      <label>Código de Seguridad (CVV - 3 dígitos):</label>
+      <input type="text" id="codigoSeguridad" maxlength="3" placeholder="Ej: 123"><br>
+
+      <p><strong>Deuda seleccionada:</strong> ${deudaSeleccionada}</p>
+      <p><strong>Monto a pagar:</strong> $${deuda.monto.toFixed(2)}</p>
+
+      <button onclick="validarPagoTarjeta('${deudaId}', ${deuda.monto})">Pagar ahora</button>
+      <button onclick="cerrarModal()">Cerrar</button>
+    </div>
+    <div id="modalBackdrop" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;" onclick="cerrarModal()"></div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function cerrarModal() {
+  const modal = document.getElementById("modalTarjeta");
+  const backdrop = document.getElementById("modalBackdrop");
+  if (modal) {
+    modal.remove();
+  }
+  if (backdrop) {
+    backdrop.remove();
+  }
+}
+
+function validarPagoTarjeta(deudaId, monto) {
+  const tarjetaNumero = document.getElementById("numeroTarjeta").value.trim();
+  const fechaVencimiento = document.getElementById("fechaVencimiento").value.trim();
+  const codigoSeguridad = document.getElementById("codigoSeguridad").value.trim();
+  const mensajeDiv = document.getElementById("mensajePago");
+
+  // Validación campos generales
+  if (!deudaId) {
+    alert("Selecciona una deuda para procesar el pago.");
+    return;
+  }
+
+  // Validar número de tarjeta (16 dígitos numéricos)
+  if (!/^\d{16}$/.test(tarjetaNumero)) {
+    alert("Número de tarjeta inválido. Debe contener exactamente 16 dígitos.");
+    return;
+  }
+
+  // Validar código de seguridad (3 dígitos)
+  if (!/^\d{3}$/.test(codigoSeguridad)) {
+    alert("Código de seguridad inválido. Debe contener exactamente 3 dígitos.");
+    return;
+  }
+
+  // Validar fecha de vencimiento (MM/AA o MM/YYYY)
+  const matchFecha = fechaVencimiento.match(/^(\d{2})\/(\d{2,4})$/);
+  if (!matchFecha) {
+    alert("Formato de fecha inválido. Usa MM/AA o MM/AAAA.");
+    return;
+  }
+
+  let [_, mes, anio] = matchFecha;
+  mes = parseInt(mes);
+  anio = parseInt(anio.length === 2 ? "20" + anio : anio);
+
+  const fechaActual = new Date();
+  const fechaMax = new Date(2027, 11); // Hasta diciembre 2027
+
+  const fechaTarjeta = new Date(anio, mes - 1);
+
+  if (mes < 1 || mes > 12 || fechaTarjeta < fechaActual || fechaTarjeta > fechaMax) {
+    alert("Fecha de vencimiento inválida o fuera del rango permitido.");
+    return;
+  }
+
+  // Obtener deuda y procesar
+  const deuda = deudasUsuario.find(d => d.id === deudaId);
+  if (!deuda) {
+    alert("Deuda no encontrada.");
+    return;
+  }
+
+  // Procesar pago
+  if (monto > deuda.monto) {
+    alert(`El monto a pagar no puede ser mayor al total de la deuda ($${deuda.monto.toFixed(2)}).`);
+    return;
+  }
+
+  deuda.monto -= monto;
+
+  let msg = `Pago con tarjeta realizado por $${monto.toFixed(2)} para la deuda "${deuda.descripcion}". `;
+
+  if (deuda.monto <= 0.01) {
+    deudasUsuario = deudasUsuario.filter(d => d.id !== deudaId);
+    msg += "Deuda saldada completamente.";
+    
+    // Actualizar el registro de deudas por cédula
+    const cedula = Object.keys(registroDeudasPorCedula).find(c => registroDeudasPorCedula[c] === deudasUsuario);
+    if (cedula) {
+      registroDeudasPorCedula[cedula] = deudasUsuario;
+    }
+  } else {
+    msg += `Saldo restante: $${deuda.monto.toFixed(2)}.`;
+  }
+
+  mensajeDiv.innerHTML = `<p style="color:green;">${msg}</p>`;
+
+  if (deudasUsuario.length === 0) {
+    document.getElementById("contenidoDeudas").innerHTML = `<p>No quedan deudas pendientes.</p>`;
+    document.getElementById("btnPagarDeudas").disabled = true;
+    document.getElementById("btnFacilidadesPago").disabled = true;
+  } else {
+    mostrarPagoDeudas();
+  }
+
+  cerrarModal(); // Cerrar el modal después de procesar el pago
+}
+
+function procesarPagoTarjeta() {
+  const numero = document.getElementById("numeroTarjeta").value.trim();
+  const vencimiento = document.getElementById("vencimientoTarjeta").value.trim();
+  const cvv = document.getElementById("codigoSeguridad").value.trim();
   const id = document.getElementById("selectDeudaPago").value;
   const montoInput = document.getElementById("montoPago").value;
   const monto = parseFloat(montoInput);
   const mensajeDiv = document.getElementById("mensajePago");
+
+  const regexNumero = /^\d{16}$/;
+  const regexCVV = /^\d{3}$/;
+  const regexVencimiento = /^(0[1-9]|1[0-2])\/(2[5-7])$/; // MM/25 a MM/27
+
+  if (!regexNumero.test(numero)) {
+    alert("Número de tarjeta inválido. Debe tener exactamente 16 dígitos numéricos.");
+    return;
+  }
+
+  if (!regexVencimiento.test(vencimiento)) {
+    alert("Fecha de vencimiento inválida o caducada. Use formato MM/AA, máximo 12/27.");
+    return;
+  }
+
+  if (!regexCVV.test(cvv)) {
+    alert("Código de seguridad inválido. Debe tener exactamente 3 dígitos.");
+    return;
+  }
 
   if (!id || isNaN(monto) || monto <= 0) {
     alert("Completa correctamente los campos para procesar el pago.");
@@ -2189,7 +2881,7 @@ function validarPagoDeudas() {
 
   deuda.monto -= monto;
 
-  let msg = `Pago realizado por $${monto.toFixed(2)} para la deuda "${deuda.descripcion}". `;
+  let msg = `✅ Pago con tarjeta realizado por $${monto.toFixed(2)} para la deuda "${deuda.descripcion}". `;
 
   if (deuda.monto <= 0.01) {
     deudasUsuario = deudasUsuario.filter(d => d.id !== id);
@@ -2209,6 +2901,48 @@ function validarPagoDeudas() {
   }
 }
 
+
+function generarBoletinPagoEfectivo() {
+  const id = document.getElementById("selectDeudaPago").value;
+
+  if (!id) {
+    alert("Selecciona una deuda para procesar el pago.");
+    return;
+  }
+
+  const deuda = deudasUsuario.find(d => d.id === id);
+  if (!deuda) {
+    alert("Deuda no encontrada.");
+    return;
+  }
+
+  // Usar el monto total de la deuda seleccionada
+  const monto = deuda.monto;
+
+  const nombresEjemplo = ["Carlos Pérez", "Ana Gómez", "Luis Rodríguez", "María Sánchez", "Jorge Torres"];
+  const nombreAleatorio = nombresEjemplo[Math.floor(Math.random() * nombresEjemplo.length)];
+  const cedula = Object.keys(registroDeudasPorCedula).find(c => registroDeudasPorCedula[c] === deudasUsuario);
+
+  let contenido = `BOLETÍN DE PAGO EN EFECTIVO\n`;
+  contenido += `Nombre: ${nombreAleatorio}\n`;
+  contenido += `Cédula: ${cedula || 'Desconocido'}\n`;
+  contenido += `Deuda: ${deuda.descripcion}\n`;
+  contenido += `Monto a pagar: $${monto.toFixed(2)}\n`;
+  contenido += `Fecha de emisión: ${new Date().toLocaleString()}\n`;
+  contenido += `\nPor favor acerquese a una entidad bancaria autorizada para realizar su pago.\n`;
+
+  const blob = new Blob([contenido], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `boletin_pago_efectivo_${cedula || 'usuario'}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+
 // --- FUNCIONES PARA FACILIDADES DE PAGO ---
 
 // Muestra solo input para cédula al principio
@@ -2223,7 +2957,6 @@ function mostrarFacilidadesPago() {
   `;
 }
 
-// Al ingresar la cédula se cargan las deudas si existen
 function cargarDeudasFacilidad() {
   const cedula = document.getElementById("cedulaFacilidad").value.trim();
   const divDeudas = document.getElementById("deudasFacilidad");
@@ -2235,7 +2968,6 @@ function cargarDeudasFacilidad() {
   divDeudas.innerHTML = "";
 
   if (!validarCedula(cedula)) {
-    // Si no es válida o está incompleta, no mostrar nada más
     return;
   }
 
@@ -2250,14 +2982,10 @@ function cargarDeudasFacilidad() {
     return;
   }
 
-  // Mostrar las deudas con checkboxes para selección
+  // Mostrar las deudas sin checkboxes
   let html = `<p><strong>Deudas encontradas:</strong></p><ul>`;
-  deudasUsuario.forEach((d, i) => {
-    html += `
-      <li>
-        <input type="checkbox" class="checkDeuda" id="deuda${i}" value="${d.id}" checked>
-        <label for="deuda${i}">${d.descripcion} - $${d.monto.toFixed(2)}</label>
-      </li>`;
+  deudasUsuario.forEach(d => {
+    html += `<li>${d.descripcion} - $${d.monto.toFixed(2)}</li>`;
   });
   html += "</ul>";
   divDeudas.innerHTML = html;
@@ -2265,10 +2993,10 @@ function cargarDeudasFacilidad() {
   // Mostrar opciones de cuotas y botón solicitar
   const totalDeuda = deudasUsuario.reduce((sum, d) => sum + d.monto, 0);
   divOpciones.innerHTML = `
-    <p><strong>Total deudas (sin filtrar):</strong> $${totalDeuda.toFixed(2)}</p>
-    <label>Selecciona número de cuotas (entre 10 y 20):</label>
+    <p><strong>Total de deudas:</strong> $${totalDeuda.toFixed(2)}</p>
+    <label>Selecciona número de cuotas (entre 2 y 30):</label>
     <select id="cuotasSelect" onchange="actualizarDetalleCuota()">
-      ${Array.from({ length: 11 }, (_, i) => i + 10).map(q => `<option value="${q}">${q} cuotas</option>`).join('')}
+      ${Array.from({ length: 29 }, (_, i) => i + 2).map(q => `<option value="${q}">${q} cuotas</option>`).join('')}
     </select>
     <p id="detalleCuota" style="margin-top:8px;"></p>
     <button onclick="validarFacilidadesPago()">Solicitar</button>
@@ -2276,25 +3004,22 @@ function cargarDeudasFacilidad() {
   actualizarDetalleCuota();
 }
 
+
 // Actualiza el detalle del valor de la cuota según selección y deudas marcadas
 function actualizarDetalleCuota() {
   const cuotas = parseInt(document.getElementById("cuotasSelect").value);
-  const checkboxes = document.querySelectorAll(".checkDeuda");
-  let sumaSeleccionadas = 0;
-  checkboxes.forEach(chk => {
-    if (chk.checked) {
-      const deuda = deudasUsuario.find(d => d.id === chk.value);
-      if (deuda) sumaSeleccionadas += deuda.monto;
-    }
-  });
+  
+  // Calcular el total de las deudas mostradas
+  const totalDeuda = deudasUsuario.reduce((sum, d) => sum + d.monto, 0);
 
-  if (sumaSeleccionadas === 0) {
-    document.getElementById("detalleCuota").innerHTML = `<em>Debe seleccionar al menos una deuda.</em>`;
+  if (totalDeuda === 0) {
+    document.getElementById("detalleCuota").innerHTML = `<em>No hay deudas para calcular.</em>`;
   } else {
-    const valorCuota = sumaSeleccionadas / cuotas;
+    const valorCuota = totalDeuda / cuotas;
     document.getElementById("detalleCuota").innerHTML = `Cada cuota será de: <strong>$${valorCuota.toFixed(2)}</strong>`;
   }
 }
+
 
 // Validación y envío de solicitud de facilidad de pago + generación archivo .txt
 function validarFacilidadesPago() {
@@ -2302,35 +3027,23 @@ function validarFacilidadesPago() {
   const cuotas = parseInt(document.getElementById("cuotasSelect").value);
   const mensajeDiv = document.getElementById("mensajeFacilidad");
 
+  // Validar cédula
   if (!validarCedula(cedula)) {
     alert("Cédula inválida. Ingrese una cédula ecuatoriana válida.");
     return;
   }
 
-  if (isNaN(cuotas) || cuotas < 10 || cuotas > 20) {
-    alert("Selecciona un número de cuotas entre 10 y 20.");
-    return;
-  }
-
-  const checkboxes = document.querySelectorAll(".checkDeuda");
-  let deudasSeleccionadas = [];
-  checkboxes.forEach(chk => {
-    if (chk.checked) {
-      const deuda = deudasUsuario.find(d => d.id === chk.value);
-      if (deuda) deudasSeleccionadas.push(deuda);
-    }
-  });
-
-  if (deudasSeleccionadas.length === 0) {
-    alert("Debe seleccionar al menos una deuda para solicitar facilidades.");
+  // Validar número de cuotas
+  if (isNaN(cuotas) || cuotas < 2 || cuotas > 30) {
+    alert("Selecciona un número de cuotas entre 2 y 30.");
     return;
   }
 
   // Calcular total de la selección
-  const totalSeleccion = deudasSeleccionadas.reduce((sum, d) => sum + d.monto, 0);
+  const totalSeleccion = deudasUsuario.reduce((sum, d) => sum + d.monto, 0);
   const valorCuota = totalSeleccion / cuotas;
 
-  // Mostrar mensaje confirmación
+  // Mostrar mensaje de confirmación
   mensajeDiv.innerHTML = `
     <p style="color:green;">
       Solicitud enviada correctamente.<br>
@@ -2341,25 +3054,30 @@ function validarFacilidadesPago() {
   `;
 
   // Generar archivo .txt con los datos
-  generarArchivoTxtFacilidad(cedula, deudasSeleccionadas, cuotas, valorCuota);
+  generarArchivoTxtFacilidad(cedula, deudasUsuario, cuotas, valorCuota);
 }
 
 // Función para generar archivo .txt y descargarlo automáticamente
 function generarArchivoTxtFacilidad(cedula, deudasSeleccionadas, cuotas, valorCuota) {
-  // Generar nombre aleatorio simple para el ejemplo (puedes cambiar a un nombre real si quieres)
+  // Generar un nombre aleatorio para el ejemplo
   const nombresEjemplo = ["Carlos Pérez", "Ana Gómez", "Luis Rodríguez", "María Sánchez", "Jorge Torres"];
   const nombreAleatorio = nombresEjemplo[Math.floor(Math.random() * nombresEjemplo.length)];
 
+  // Crear contenido del archivo
   let contenido = `Solicitud de Facilidades de Pago\n`;
   contenido += `Nombre: ${nombreAleatorio}\n`;
   contenido += `Cédula: ${cedula}\n\n`;
   contenido += `Deudas seleccionadas:\n`;
+  
+  // Listar deudas seleccionadas
   deudasSeleccionadas.forEach(d => {
     contenido += `- ${d.descripcion}: $${d.monto.toFixed(2)}\n`;
   });
+  
   contenido += `\nNúmero de cuotas: ${cuotas}\n`;
   contenido += `Valor por cuota: $${valorCuota.toFixed(2)}\n`;
-  contenido += `Fecha solicitud: ${new Date().toLocaleString()}\n`;
+  contenido += `Fecha de solicitud: ${new Date().toLocaleString()}\n`;
+  contenido += `\nGracias por utilizar nuestro servicio.`;
 
   // Crear Blob y forzar descarga
   const blob = new Blob([contenido], { type: 'text/plain' });
