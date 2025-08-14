@@ -2719,7 +2719,7 @@ function mostrarFormularioTarjeta() {
       <input type="text" id="numeroTarjeta" maxlength="16" placeholder="Ej: 1234567812345678"><br>
 
       <label>Fecha de Vencimiento (MM/AA):</label>
-      <input type="text" id="fechaVencimiento" placeholder="Ej: 12/27"><br>
+      <input type="text" id="fechaVencimiento" placeholder="Ej: 12/35"><br>
 
       <label>Código de Seguridad (CVV - 3 dígitos):</label>
       <input type="text" id="codigoSeguridad" maxlength="3" placeholder="Ej: 123"><br>
@@ -2772,9 +2772,9 @@ function validarPagoTarjeta(deudaId, monto) {
   }
 
   // Validar fecha de vencimiento (MM/AA o MM/YYYY)
-  const matchFecha = fechaVencimiento.match(/^(\d{2})\/(\d{2,4})$/);
+  const matchFecha = fechaVencimiento.match(/^(\d{2})\/(\d{2})$/);
   if (!matchFecha) {
-    alert("Formato de fecha inválido. Usa MM/AA o MM/AAAA.");
+    alert("Formato de fecha inválido. Usa MM/AA.");
     return;
   }
 
@@ -2783,7 +2783,7 @@ function validarPagoTarjeta(deudaId, monto) {
   anio = parseInt(anio.length === 2 ? "20" + anio : anio);
 
   const fechaActual = new Date();
-  const fechaMax = new Date(2027, 11); // Hasta diciembre 2027
+  const fechaMax = new Date(2035, 11); // Hasta diciembre 2027
 
   const fechaTarjeta = new Date(anio, mes - 1);
 
@@ -2846,7 +2846,7 @@ function procesarPagoTarjeta() {
 
   const regexNumero = /^\d{16}$/;
   const regexCVV = /^\d{3}$/;
-  const regexVencimiento = /^(0[1-9]|1[0-2])\/(2[5-7])$/; // MM/25 a MM/27
+  const regexVencimiento = /^(0[1-9]|1[0-2])\/(2[5-9]|3[0-5])$/; // MM/25 a MM/35
 
   if (!regexNumero.test(numero)) {
     alert("Número de tarjeta inválido. Debe tener exactamente 16 dígitos numéricos.");
@@ -2854,7 +2854,7 @@ function procesarPagoTarjeta() {
   }
 
   if (!regexVencimiento.test(vencimiento)) {
-    alert("Fecha de vencimiento inválida o caducada. Use formato MM/AA, máximo 12/27.");
+    alert("Fecha de vencimiento inválida o caducada. Use formato MM/AA, máximo 12/35.");
     return;
   }
 
